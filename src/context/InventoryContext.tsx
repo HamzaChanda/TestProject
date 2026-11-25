@@ -86,6 +86,22 @@ function useInventoryStore() {
       cancelSale: (id: ID, reason: string) => run((s) => engine.cancelSale(s, id, reason), (sale) => `${sale.invoiceNo} cancelled. Stock has been restored.`),
       completeSale: (id: ID) => run((s) => engine.completeSale(s, id), (sale) => `${sale.invoiceNo} marked as completed.`),
       recordPayment: (id: ID, amount: number) => run((s) => engine.recordPayment(s, id, amount), "Payment recorded."),
+      // Bulk: chain the same engine transactions over a clone — all apply or none do, one toast.
+      completeSales: (ids: ID[]) =>
+        run(
+          (s) => ids.reduce<TxResult<number>>((acc, id) => ({ state: engine.completeSale(acc.state, id).state, result: acc.result + 1 }), { state: s, result: 0 }),
+          (n) => `${n} invoice${n === 1 ? "" : "s"} marked as completed.`,
+        ),
+      recordFullPayments: (ids: ID[]) =>
+        run(
+          (s) =>
+            ids.reduce<TxResult<number>>((acc, id) => {
+              const sale = acc.state.sales.find((x) => x.id === id);
+              const due = sale ? Math.round((sale.total - sale.amountPaid) * 100) / 100 : 0;
+              return { state: engine.recordPayment(acc.state, id, due).state, result: acc.result + 1 };
+            }, { state: s, result: 0 }),
+          (n) => `Full payment recorded on ${n} invoice${n === 1 ? "" : "s"}.`,
+        ),
 
       // Purchases
       createPurchase: (input: PurchaseInput) =>

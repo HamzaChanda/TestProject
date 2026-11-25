@@ -60,7 +60,7 @@ export default function SettingsPage() {
                   onClick={() => setActive(sec.id)}
                   aria-current={active === sec.id ? "true" : undefined}
                   className={cn(
-                    "flex items-center gap-2.5 rounded-control px-2.5 py-2 text-body font-medium transition-colors",
+                    "flex items-center gap-2.5 rounded-control px-2.5 py-2 text-body-sm font-medium transition-colors",
                     active === sec.id ? "bg-surface text-ink shadow-[var(--shadow-card)] ring-1 ring-line" : "text-muted hover:bg-surface/70 hover:text-ink",
                   )}
                 >
@@ -126,7 +126,7 @@ function BusinessProfile() {
           </div>
         </CardBody>
         <div className="flex items-center justify-end gap-2 border-t border-line bg-subtle px-5 py-3">
-          {formState.isDirty && <span className="mr-auto text-small text-warning">Unsaved changes</span>}
+          {formState.isDirty && <span className="mr-auto text-label text-warning">Unsaved changes</span>}
           <Button variant="secondary" onClick={() => reset()} disabled={!formState.isDirty}>
             Discard
           </Button>
@@ -156,16 +156,16 @@ function CurrencySettings() {
                 s.currency === c.code ? "border-brand bg-brand-50/50 ring-[3px] ring-brand/10" : "border-line hover:border-line-strong",
               )}
             >
-              <span className="grid h-9 w-9 place-items-center rounded-control bg-surface text-body font-semibold text-ink ring-1 ring-line">{c.symbol}</span>
+              <span className="grid h-9 w-9 place-items-center rounded-control bg-surface text-body-sm font-semibold text-ink ring-1 ring-line">{c.symbol}</span>
               <span className="min-w-0 flex-1">
-                <span className="block text-body font-medium text-ink">{c.code}</span>
-                <span className="block text-small text-muted">{c.label}</span>
+                <span className="block text-body-sm font-medium text-ink">{c.code}</span>
+                <span className="block text-label text-muted">{c.label}</span>
               </span>
               {s.currency === c.code && <Badge tone="brand">Active</Badge>}
             </button>
           ))}
         </div>
-        <p className="mt-3 text-small text-muted">
+        <p className="mt-3 text-label text-muted">
           Preview: <span className="font-medium text-ink tabular">{formatCurrency(1284500)}</span>
         </p>
       </CardBody>
@@ -193,7 +193,7 @@ function TaxSettings() {
             <button
               key={t}
               onClick={() => setRate(String(t))}
-              className={cn("h-8 rounded-full border px-3 text-small font-medium transition", Number(rate) === t ? "border-brand bg-brand-50 text-brand" : "border-line text-ink-2 hover:border-line-strong")}
+              className={cn("h-8 rounded-full border px-3 text-label font-medium transition", Number(rate) === t ? "border-brand bg-brand-50 text-brand" : "border-line text-ink-2 hover:border-line-strong")}
             >
               {t}%
             </button>
@@ -207,7 +207,7 @@ function TaxSettings() {
             Save tax rate
           </Button>
         </div>
-        <p className="text-small text-muted">
+        <p className="text-label text-muted">
           Current default: <span className="font-medium text-ink">{s.defaultTaxRate}%</span> · split as CGST {s.defaultTaxRate / 2}% + SGST {s.defaultTaxRate / 2}% on invoices.
         </p>
       </CardBody>
@@ -244,7 +244,7 @@ function WarehouseRow({ warehouse }: { warehouse: Warehouse }) {
   return (
     <div className="rounded-panel border border-line p-4">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-body text-muted">
+        <div className="flex items-center gap-2 text-body-sm text-muted">
           <WarehouseIcon className="h-4 w-4" /> {units} units stored
           {warehouse.isDefault && (
             <Badge tone="brand" dot={false}>
@@ -297,8 +297,8 @@ function DataSettings() {
           <span className="flex gap-3">
             <Bell className="mt-0.5 h-4 w-4 text-muted" />
             <span>
-              <span className="block text-body font-medium text-ink">Low-stock notifications</span>
-              <span className="block text-small text-muted">Show alerts in the notification centre when products reach their minimum level.</span>
+              <span className="block text-body-sm font-medium text-ink">Low-stock notifications</span>
+              <span className="block text-label text-muted">Show alerts in the notification centre when products reach their minimum level.</span>
             </span>
           </span>
           <button
@@ -313,8 +313,8 @@ function DataSettings() {
         </label>
         <div className="flex flex-col gap-3 rounded-panel border border-line p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="text-body font-medium text-ink">Your data</div>
-            <div className="text-small text-muted">
+            <div className="text-body-sm font-medium text-ink">Your data</div>
+            <div className="text-label text-muted">
               Stored in this browser · {state.products.length} products, {state.sales.length} invoices, {state.purchases.length} POs, {state.movements.length} stock movements.
             </div>
           </div>
@@ -338,8 +338,8 @@ function DataSettings() {
         </div>
         <div className="flex flex-col gap-3 rounded-panel border border-danger-line bg-danger-bg/40 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="text-body font-medium text-danger">Reset demo data</div>
-            <div className="text-small text-muted">Replace everything in this browser with the original sample data.</div>
+            <div className="text-body-sm font-medium text-danger">Reset demo data</div>
+            <div className="text-label text-muted">Replace everything in this browser with the original sample data.</div>
           </div>
           <Button variant="danger" size="sm" icon={<RotateCcw className="h-3.5 w-3.5" />} onClick={() => setResetOpen(true)}>
             Reset data

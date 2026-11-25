@@ -54,14 +54,14 @@ export function ActivityFeed({ activities }: { activities: Activity[] }) {
             </span>
             <div className="min-w-0 flex-1 pb-4">
               <div className="flex items-baseline justify-between gap-2">
-                <span className="truncate text-body font-medium text-ink">{a.title}</span>
-                <time className="shrink-0 text-caption text-faint" title={formatDateTime(a.date)} dateTime={a.date}>
+                <span className="truncate text-body-sm font-medium text-ink">{a.title}</span>
+                <time className="shrink-0 text-label text-faint" title={formatDateTime(a.date)} dateTime={a.date}>
                   {timeAgo(a.date)}
                 </time>
               </div>
-              <p className="truncate text-small text-muted">{a.description}</p>
+              <p className="truncate text-label text-muted">{a.description}</p>
               {a.reference && (
-                <span className="mt-1 inline-block rounded-[5px] bg-fill px-1.5 py-px font-mono text-micro text-ink-2">{a.reference}</span>
+                <span className="mt-1 inline-block rounded-[5px] bg-fill px-1.5 py-px font-mono text-overline text-ink-2">{a.reference}</span>
               )}
             </div>
           </>

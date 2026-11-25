@@ -17,22 +17,25 @@ import {
 import { CHART_COLORS } from "@/lib/constants";
 import { cn, formatCompactCurrency, formatCurrency, formatNumber } from "@/lib/utils";
 
-const AXIS = { fontSize: 11.5, fill: "#8a8f9c" };
+// Token literals (SVG attributes cannot read CSS vars): faint #89928e, sunken #eef0ee.
+const AXIS = { fontSize: 11, fill: "#89928e", fontFamily: "var(--font-plex-mono), ui-monospace, monospace" };
+const GRID = "#eef0ee";
+const CURSOR = { fill: "rgba(17,22,20,0.04)", radius: 4 };
 const SALES = CHART_COLORS[0];
 const PURCHASES = CHART_COLORS[1];
 
 function TooltipBox({ title, rows }: { title: string; rows: { label: string; value: string; color?: string }[] }) {
   return (
     <div className="min-w-[180px] rounded-panel border border-line bg-surface px-3 py-2.5 shadow-[var(--shadow-pop)]">
-      <div className="mb-1.5 text-small font-semibold text-ink">{title}</div>
+      <div className="mb-1.5 text-label font-semibold text-ink">{title}</div>
       <div className="space-y-1">
         {rows.map((r) => (
-          <div key={r.label} className="flex items-center justify-between gap-4 text-small">
+          <div key={r.label} className="flex items-center justify-between gap-4 text-label">
             <span className="flex items-center gap-1.5 text-muted">
               {r.color && <span className="h-2 w-2 rounded-[3px]" style={{ background: r.color }} />}
               {r.label}
             </span>
-            <span className="font-medium text-ink tabular">{r.value}</span>
+            <span className="font-mono text-[12px] text-ink">{r.value}</span>
           </div>
         ))}
       </div>
@@ -42,7 +45,7 @@ function TooltipBox({ title, rows }: { title: string; rows: { label: string; val
 
 export function LegendItem({ color, label, value }: { color: string; label: string; value?: string }) {
   return (
-    <span className="inline-flex items-center gap-1.5 text-small text-ink-2">
+    <span className="inline-flex items-center gap-1.5 text-label text-ink-2">
       <span className="h-2.5 w-2.5 rounded-[3px]" style={{ background: color }} />
       {label}
       {value && <span className="font-medium text-ink tabular">{value}</span>}
@@ -74,24 +77,24 @@ export function SalesPurchasesChart({ data, height = 280 }: { data: MonthlyPoint
             key={s.key}
             onClick={() => toggle(s.key)}
             className={cn(
-              "inline-flex items-center gap-1.5 rounded-full border border-line px-2.5 py-1 text-small font-medium transition",
+              "inline-flex h-6 items-center gap-1.5 rounded-tag border border-line px-2 text-label font-medium transition-colors duration-[80ms] focus-visible:outline-2 focus-visible:outline-brand",
               hidden[s.key] ? "text-faint opacity-60" : "text-ink-2 hover:bg-subtle",
             )}
             aria-pressed={!hidden[s.key]}
           >
-            <span className="h-2.5 w-2.5 rounded-[3px]" style={{ background: hidden[s.key] ? "#d0d3da" : s.color }} />
+            <span className="size-2.5 rounded-[2px]" style={{ background: hidden[s.key] ? "#d2d8d4" : s.color }} />
             {s.label}
           </button>
         ))}
       </div>
       <div style={{ height }} className="-ml-2">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} barGap={2} barCategoryGap="28%" margin={{ top: 6, right: 4, left: 0, bottom: 0 }}>
-            <CartesianGrid vertical={false} stroke="#eef0f3" />
-            <XAxis dataKey="label" tickLine={false} axisLine={false} tick={AXIS} dy={6} />
+          <BarChart data={data} barGap={data.length > 16 ? 1 : 2} barCategoryGap={data.length > 16 ? "18%" : "28%"} margin={{ top: 6, right: 4, left: 0, bottom: 0 }}>
+            <CartesianGrid vertical={false} stroke={GRID} />
+            <XAxis dataKey="label" tickLine={false} axisLine={false} tick={AXIS} dy={6} interval="preserveStartEnd" minTickGap={18} />
             <YAxis tickLine={false} axisLine={false} tick={AXIS} width={56} tickFormatter={(v) => formatCompactCurrency(v)} />
             <Tooltip
-              cursor={{ fill: "rgba(99,91,255,0.06)", radius: 6 }}
+              cursor={CURSOR}
               content={({ active, payload }: TooltipProps<number, string>) => {
                 if (!active || !payload?.length) return null;
                 const p = payload[0].payload as MonthlyPoint;
@@ -107,8 +110,8 @@ export function SalesPurchasesChart({ data, height = 280 }: { data: MonthlyPoint
                 );
               }}
             />
-            {!hidden.sales && <Bar dataKey="sales" name="Sales" fill={SALES} radius={[4, 4, 0, 0]} maxBarSize={28} />}
-            {!hidden.purchases && <Bar dataKey="purchases" name="Purchases" fill={PURCHASES} radius={[4, 4, 0, 0]} maxBarSize={28} />}
+            {!hidden.sales && <Bar dataKey="sales" name="Sales" fill={SALES} radius={[3, 3, 0, 0]} maxBarSize={data.length > 16 ? 10 : 24} isAnimationActive={false} />}
+            {!hidden.purchases && <Bar dataKey="purchases" name="Purchases" fill={PURCHASES} radius={[3, 3, 0, 0]} maxBarSize={data.length > 16 ? 10 : 24} isAnimationActive={false} />}
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -168,9 +171,9 @@ export function DonutChart({
           </PieChart>
         </ResponsiveContainer>
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-          <span className="text-caption text-muted">{active ? active.name : centerLabel}</span>
-          <span className="text-title font-semibold tracking-[-0.01em] text-ink tabular">{fmtCompact(active ? active.value : total)}</span>
-          {active && <span className="text-caption text-muted tabular">{total ? ((active.value / total) * 100).toFixed(1) : 0}%</span>}
+          <span className="text-label text-muted">{active ? active.name : centerLabel}</span>
+          <span className="text-h3 font-semibold tracking-[-0.01em] text-ink tabular">{fmtCompact(active ? active.value : total)}</span>
+          {active && <span className="text-label text-muted tabular">{total ? ((active.value / total) * 100).toFixed(1) : 0}%</span>}
         </div>
       </div>
       <ul className="w-full min-w-0 flex-1 space-y-1">
@@ -179,7 +182,7 @@ export function DonutChart({
             key={d.name}
             onMouseEnter={() => setActiveIdx(i)}
             onMouseLeave={() => setActiveIdx(null)}
-            className={cn("flex items-center gap-2.5 rounded-control px-2 py-1.5 text-small transition-colors", activeIdx === i && "bg-subtle")}
+            className={cn("flex items-center gap-2.5 rounded-control px-2 py-1.5 text-label transition-colors", activeIdx === i && "bg-subtle")}
           >
             <span className="h-2.5 w-2.5 shrink-0 rounded-[3px]" style={{ background: colorFor(i) }} />
             <span className="min-w-0 flex-1 truncate text-ink-2">
@@ -212,7 +215,7 @@ export function RankedBars({
     <ul className="space-y-3">
       {data.map((d) => (
         <li key={d.name} className="group">
-          <div className="mb-1 flex items-baseline justify-between gap-3 text-small">
+          <div className="mb-1 flex items-baseline justify-between gap-3 text-label">
             <span className="truncate text-ink-2">
               {d.name}
               {d.sub && <span className="ml-1.5 text-faint">{d.sub}</span>}
@@ -246,11 +249,11 @@ export function TrendBarChart({
     <div style={{ height }} className="-ml-2">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} barCategoryGap={dense ? "18%" : "30%"} margin={{ top: 6, right: 4, left: 0, bottom: 0 }}>
-          <CartesianGrid vertical={false} stroke="#eef0f3" />
+          <CartesianGrid vertical={false} stroke={GRID} />
           <XAxis dataKey="label" tickLine={false} axisLine={false} tick={AXIS} dy={6} interval={dense ? "preserveStartEnd" : 0} minTickGap={12} />
           <YAxis tickLine={false} axisLine={false} tick={AXIS} width={56} tickFormatter={(v) => formatCompactCurrency(v)} />
           <Tooltip
-            cursor={{ fill: "rgba(99,91,255,0.06)", radius: 6 }}
+            cursor={CURSOR}
             content={({ active, payload }: TooltipProps<number, string>) => {
               if (!active || !payload?.length) return null;
               const p = payload[0].payload as { fullLabel: string; value: number; count?: number };

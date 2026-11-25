@@ -33,7 +33,7 @@ export default function CustomerDetailPage() {
   if (!customer) return <NotFoundState entity="Customer" backHref="/customers" />;
 
   const columns: Column<Sale>[] = [
-    { key: "invoice", header: "Invoice", sortValue: (s) => s.invoiceNo, cell: (s) => <span className="font-mono text-small font-medium text-ink">{s.invoiceNo}</span> },
+    { key: "invoice", header: "Invoice", sortValue: (s) => s.invoiceNo, cell: (s) => <span className="font-mono text-label font-medium text-ink">{s.invoiceNo}</span> },
     { key: "date", header: "Date", sortValue: (s) => s.date, cell: (s) => formatDate(s.date) },
     { key: "items", header: "Items", cell: (s) => <span className="block max-w-[260px] truncate text-muted">{s.items.map((i) => `${i.quantity}× ${i.name}`).join(", ")}</span>, hideOnMobile: true },
     { key: "amount", header: "Amount", align: "right", sortValue: (s) => s.total, cell: (s) => <span className="font-semibold text-ink tabular">{formatCurrency(s.total)}</span> },
@@ -51,7 +51,7 @@ export default function CustomerDetailPage() {
             <Avatar name={customer.name} size={40} />
             <span>
               {customer.name}
-              {customer.company && <span className="block text-body font-normal tracking-normal text-muted">{customer.company}</span>}
+              {customer.company && <span className="block text-body-sm font-normal tracking-normal text-muted">{customer.company}</span>}
             </span>
           </span>
         }
@@ -94,7 +94,7 @@ export default function CustomerDetailPage() {
         <div className="space-y-5">
           <Card>
             <CardHeader title="Contact information" />
-            <CardBody className="space-y-3 text-body">
+            <CardBody className="space-y-3 text-body-sm">
               <a href={`mailto:${customer.email}`} className="flex items-center gap-2.5 text-ink-2 hover:text-brand">
                 <Mail className="h-4 w-4 text-muted" /> {customer.email}
               </a>
@@ -108,11 +108,11 @@ export default function CustomerDetailPage() {
                 </div>
               )}
               {customer.gstin && (
-                <div className="border-t border-line pt-3 text-small text-muted">
+                <div className="border-t border-line pt-3 text-label text-muted">
                   GSTIN <span className="font-mono text-ink-2">{customer.gstin}</span>
                 </div>
               )}
-              <div className="text-small text-muted">Customer since {formatDate(customer.createdAt, "MMM yyyy")}</div>
+              <div className="text-label text-muted">Customer since {formatDate(customer.createdAt, "MMM yyyy")}</div>
             </CardBody>
           </Card>
           {topProducts.length > 0 && (

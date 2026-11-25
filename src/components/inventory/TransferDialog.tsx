@@ -123,7 +123,7 @@ export function TransferDialog({ open, onClose, productId }: { open: boolean; on
         </Field>
 
         {product && from !== to && (
-          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-panel border border-line bg-subtle p-3 text-center text-small">
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-panel border border-line bg-subtle p-3 text-center text-label">
             <div>
               <div className="text-muted">{nameOf(from)}</div>
               <div className="mt-0.5 font-medium text-ink tabular">
@@ -157,8 +157,8 @@ export function TransferDialog({ open, onClose, productId }: { open: boolean; on
               >
                 <o.icon className={cn("mt-0.5 h-4 w-4", completeNow === o.v ? "text-brand" : "text-muted")} />
                 <span>
-                  <span className="block text-body font-medium text-ink">{o.title}</span>
-                  <span className="block text-small text-muted">{o.body}</span>
+                  <span className="block text-body-sm font-medium text-ink">{o.title}</span>
+                  <span className="block text-label text-muted">{o.body}</span>
                 </span>
               </button>
             ))}

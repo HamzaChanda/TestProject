@@ -76,7 +76,12 @@ function Shell({ children }: { children: ReactNode }) {
       }
       if (e.altKey || isTyping(e.target) || document.querySelector("[data-overlay-panel]")) return;
       const s = shortcutState.current;
-      if (e.key === "?") {
+      if (e.key === "/") {
+        const search = document.querySelector<HTMLInputElement>("[data-page-search]");
+        e.preventDefault();
+        if (search) search.focus();
+        else setSearchOpen(true);
+      } else if (e.key === "?") {
         e.preventDefault();
         setHelpOpen(true);
       } else if (e.key.toLowerCase() === "g" && !s.goPending) {
@@ -146,7 +151,7 @@ function Shell({ children }: { children: ReactNode }) {
       <div
         className={cn(
           "no-print fixed inset-y-0 left-0 z-30 hidden transition-[width] duration-200 md:block",
-          collapsed ? "w-[68px]" : "w-[248px]",
+          collapsed ? "w-rail" : "w-sidebar",
         )}
       >
         <Sidebar collapsed={collapsed} onToggleCollapse={tablet ? undefined : toggleCollapsed} {...sidebarProps} />
@@ -162,14 +167,14 @@ function Shell({ children }: { children: ReactNode }) {
         </div>
       )}
 
-      <div className={cn("flex min-h-dvh flex-col transition-[padding] duration-200 print:!pl-0", collapsed ? "md:pl-[68px]" : "md:pl-[248px]")}>
+      <div className={cn("flex min-h-dvh flex-col transition-[padding] duration-200 print:!pl-0", collapsed ? "md:pl-rail" : "md:pl-sidebar")}>
         <Header
           onOpenMobileNav={() => setMobileOpen(true)}
           onOpenSearch={() => setSearchOpen(true)}
           onOpenHelp={() => setHelpOpen(true)}
           onResetData={() => setResetOpen(true)}
         />
-        <main className="print-shell mx-auto w-full max-w-[1440px] flex-1 px-4 py-6 md:px-6 lg:px-8 lg:py-7">{children}</main>
+        <main className="print-shell mx-auto w-full max-w-[1440px] flex-1 px-4 py-6 md:px-6 lg:px-8 lg:pt-7 lg:pb-12">{children}</main>
       </div>
 
       <CommandPalette open={searchOpen} onClose={() => setSearchOpen(false)} />
@@ -189,13 +194,12 @@ function Shell({ children }: { children: ReactNode }) {
 function LoadingShell() {
   return (
     <div className="min-h-dvh">
-      <div className="fixed inset-y-0 left-0 hidden w-[68px] border-r border-line bg-surface p-4 md:block xl:w-[248px]">
+      <div className="fixed inset-y-0 left-0 hidden w-rail border-r border-line bg-surface p-3 md:block xl:w-sidebar">
         <div className="flex items-center gap-2.5">
           <Logo />
           <div className="hidden xl:block">
-            <div className="text-title-sm font-semibold">StockFlow</div>
-            <div className="text-caption text-muted">Inventory &amp; Operations</div>
-          </div>
+            <div className="text-h3 font-semibold">StockFlow</div>
+                      </div>
         </div>
         <div className="mt-8 space-y-2.5">
           {Array.from({ length: 9 }).map((_, i) => (
@@ -203,16 +207,16 @@ function LoadingShell() {
           ))}
         </div>
       </div>
-      <div className="md:pl-[68px] xl:pl-[248px]">
-        <div className="h-[60px] border-b border-line bg-surface" />
+      <div className="md:pl-rail xl:pl-sidebar">
+        <div className="h-header border-b border-line bg-canvas" />
         <div className="mx-auto max-w-[1440px] space-y-6 px-4 py-7 md:px-6 lg:px-8">
           <Skeleton className="h-8 w-56" />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-[120px] rounded-xl" />
+              <Skeleton key={i} className="h-[92px] rounded-panel" />
             ))}
           </div>
-          <Skeleton className="h-[320px] rounded-xl" />
+          <Skeleton className="h-[320px] rounded-panel" />
         </div>
       </div>
     </div>
@@ -227,9 +231,20 @@ export function AppShell({ children }: { children: ReactNode }) {
       </InventoryProvider>
       <Toaster
         position="bottom-right"
-        richColors
         closeButton
-        toastOptions={{ style: { fontFamily: "var(--font-sans)", fontSize: 13.5, borderRadius: 12 } }}
+        gap={8}
+        toastOptions={{
+          classNames: {
+            toast: "!bg-ink !text-white !border-0 !rounded-panel !shadow-pop !font-sans !text-body-sm !gap-2.5 !py-3 !px-3.5",
+            description: "!text-white/70 !text-label",
+            closeButton: "!bg-ink !text-white/70 !border-white/20 hover:!text-white",
+            actionButton: "!bg-transparent !text-petrol-100 !font-semibold",
+            success: "[&_[data-icon]]:!text-success-solid",
+            error: "[&_[data-icon]]:!text-danger-solid",
+            warning: "[&_[data-icon]]:!text-signal",
+            info: "[&_[data-icon]]:!text-info-solid",
+          },
+        }}
       />
     </>
   );

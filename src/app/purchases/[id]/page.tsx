@@ -88,7 +88,7 @@ export default function PurchaseDetailPage() {
               return (
                 <li key={s} className="flex flex-col gap-2">
                   <div className={cn("h-1.5 rounded-full", done ? "bg-success-solid" : current ? "bg-brand" : "bg-pressed")} />
-                  <span className={cn("text-small font-medium", done ? "text-success" : current ? "text-brand" : "text-faint")}>
+                  <span className={cn("text-label font-medium", done ? "text-success" : current ? "text-brand" : "text-faint")}>
                     {s}
                     {s === "Receiving" && progress.received > 0 && progress.remaining > 0 && <span className="ml-1 text-muted">({progress.pct}%)</span>}
                   </span>
@@ -98,7 +98,7 @@ export default function PurchaseDetailPage() {
           </ol>
         </Card>
       ) : (
-        <div className="no-print mb-5 rounded-card border border-line bg-surface px-4 py-3 text-body text-ink-2">
+        <div className="no-print mb-5 rounded-card border border-line bg-surface px-4 py-3 text-body-sm text-ink-2">
           <span className="font-medium text-ink">Cancelled {formatDateTime(po.cancelledAt)}.</span>{" "}
           {progress.received > 0 ? `${progress.received} units received before cancellation remain in stock.` : "No stock was received on this order."}
         </div>
@@ -109,9 +109,9 @@ export default function PurchaseDetailPage() {
           <Card className="print-area overflow-hidden">
             <CardHeader title="Order items" description={`${progress.received} of ${progress.ordered} units received · ${progress.remaining} remaining`} />
             <div className="scrollbar-thin overflow-x-auto">
-              <table className="w-full min-w-[640px] text-body">
+              <table className="w-full min-w-[640px] text-body-sm">
                 <thead>
-                  <tr className="border-y border-line bg-subtle text-left text-caption font-medium tracking-wide text-muted uppercase">
+                  <tr className="border-y border-line bg-subtle text-left text-label font-medium tracking-wide text-muted uppercase">
                     <th className="h-9 px-5">Product</th>
                     <th className="px-3 text-right">Ordered</th>
                     <th className="px-3 text-right">Received</th>
@@ -137,7 +137,7 @@ export default function PurchaseDetailPage() {
                               ) : (
                                 <span className="font-medium text-ink">{i.name}</span>
                               )}
-                              <div className="font-mono text-caption text-muted">{i.sku}</div>
+                              <div className="font-mono text-label text-muted">{i.sku}</div>
                             </div>
                           </div>
                         </td>
@@ -156,7 +156,7 @@ export default function PurchaseDetailPage() {
                 </tbody>
               </table>
             </div>
-            <dl className="ml-auto w-full max-w-[320px] space-y-2 border-t border-line px-5 py-4 text-body">
+            <dl className="ml-auto w-full max-w-[320px] space-y-2 border-t border-line px-5 py-4 text-body-sm">
               <div className="flex justify-between">
                 <dt className="text-muted">Subtotal</dt>
                 <dd className="tabular">{formatCurrency(po.subtotal)}</dd>
@@ -167,7 +167,7 @@ export default function PurchaseDetailPage() {
               </div>
               <div className="flex justify-between border-t border-line pt-2">
                 <dt className="font-semibold text-ink">Total amount</dt>
-                <dd className="text-title font-semibold text-ink tabular">{formatCurrency(po.total)}</dd>
+                <dd className="text-h3 font-semibold text-ink tabular">{formatCurrency(po.total)}</dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-muted">Received value</dt>
@@ -180,7 +180,7 @@ export default function PurchaseDetailPage() {
             <CardHeader title="Receiving history" description="Each goods receipt (GRN) added stock to inventory." />
             <CardBody>
               {po.receipts.length === 0 ? (
-                <div className="flex items-center gap-3 rounded-panel border border-dashed border-line-strong px-4 py-5 text-body text-muted">
+                <div className="flex items-center gap-3 rounded-panel border border-dashed border-line-strong px-4 py-5 text-body-sm text-muted">
                   <Truck className="h-5 w-5 text-faint" />
                   {po.status === "Draft" ? "Place this order before receiving goods." : po.status === "Cancelled" ? "No goods were received." : "No goods received yet. Inventory is unchanged."}
                 </div>
@@ -193,11 +193,11 @@ export default function PurchaseDetailPage() {
                           <span className="grid h-7 w-7 place-items-center rounded-full bg-success-bg text-success">
                             <PackageCheck className="h-3.5 w-3.5" />
                           </span>
-                          <span className="font-mono text-small font-medium text-ink">{r.reference}</span>
+                          <span className="font-mono text-label font-medium text-ink">{r.reference}</span>
                         </span>
-                        <span className="text-small text-muted">{formatDateTime(r.date)}</span>
+                        <span className="text-label text-muted">{formatDateTime(r.date)}</span>
                       </div>
-                      <ul className="mt-2 space-y-1 pl-9 text-small">
+                      <ul className="mt-2 space-y-1 pl-9 text-label">
                         {r.items.map((it) => (
                           <li key={it.productId} className="flex justify-between text-ink-2">
                             <span>{po.items.find((x) => x.productId === it.productId)?.name}</span>
@@ -205,7 +205,7 @@ export default function PurchaseDetailPage() {
                           </li>
                         ))}
                       </ul>
-                      {r.note && <p className="mt-2 pl-9 text-small text-muted">{r.note}</p>}
+                      {r.note && <p className="mt-2 pl-9 text-label text-muted">{r.note}</p>}
                     </li>
                   ))}
                 </ol>
@@ -236,19 +236,19 @@ export default function PurchaseDetailPage() {
           {supplier && (
             <Card>
               <CardHeader title="Supplier" actions={<ButtonLink href={`/suppliers/${supplier.id}`} variant="ghost" size="sm">View</ButtonLink>} />
-              <CardBody className="space-y-1 text-body">
+              <CardBody className="space-y-1 text-body-sm">
                 <div className="font-medium text-ink">{supplier.name}</div>
                 <div className="text-ink-2">{supplier.contactPerson}</div>
                 <div className="text-muted">{supplier.email}</div>
                 <div className="text-muted">{supplier.phone}</div>
-                <div className="pt-1 text-small text-muted">
+                <div className="pt-1 text-label text-muted">
                   Terms: <span className="text-ink-2">{supplier.paymentTerms}</span>
                 </div>
               </CardBody>
             </Card>
           )}
           {po.status === "Draft" && (
-            <div className="flex gap-2.5 rounded-card border border-line bg-surface p-3.5 text-small text-muted">
+            <div className="flex gap-2.5 rounded-card border border-line bg-surface p-3.5 text-label text-muted">
               <FileClock className="mt-0.5 h-4 w-4 shrink-0 text-faint" />
               This is a draft. Place the order to start receiving stock against it.
             </div>

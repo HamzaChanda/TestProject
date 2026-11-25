@@ -1,15 +1,15 @@
-export function Logo({ size = 30 }: { size?: number }) {
+/**
+ * Bin-tag mark: an ink-outlined shelf tag with three petrol stock bars —
+ * the Stockroom motif reduced to a glyph.
+ */
+export function Logo({ size = 28 }: { size?: number }) {
   return (
-    <span
-      className="grid shrink-0 place-items-center rounded-control bg-brand text-white shadow-[0_1px_2px_rgba(16,24,40,0.15),inset_0_1px_0_rgba(255,255,255,0.18)]"
-      style={{ width: size, height: size }}
-      aria-hidden
-    >
-      <svg width={size * 0.56} height={size * 0.56} viewBox="0 0 24 24" fill="none">
-        <path d="M4 7.5 12 3l8 4.5-8 4.5-8-4.5Z" fill="currentColor" fillOpacity=".95" />
-        <path d="m4 12 8 4.5 8-4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeOpacity=".75" />
-        <path d="m4 16.5 8 4.5 8-4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeOpacity=".5" />
-      </svg>
-    </span>
+    <svg width={size} height={size} viewBox="0 0 28 28" fill="none" aria-hidden className="shrink-0">
+      <rect x="1.75" y="4.75" width="24.5" height="18.5" rx="4" stroke="var(--color-ink)" strokeWidth="1.5" fill="var(--color-surface)" />
+      <circle cx="6.5" cy="14" r="1.6" fill="var(--color-ink)" />
+      <rect x="10.5" y="15" width="3" height="4.5" rx=".75" fill="var(--color-petrol-500)" />
+      <rect x="15.25" y="11.5" width="3" height="8" rx=".75" fill="var(--color-petrol-500)" />
+      <rect x="20" y="8.5" width="3" height="11" rx=".75" fill="var(--color-petrol-500)" />
+    </svg>
   );
 }

@@ -101,7 +101,7 @@ export function Modal(props: OverlayProps & { size?: "sm" | "md" | "lg" }) {
   if (!mounted || !isClient) return null;
   return createPortal(
     <div className={cn("fixed inset-0 z-[70] flex items-end justify-center sm:items-center sm:p-4", closing && "pointer-events-none")}>
-      <div className={cn("absolute inset-0 bg-scrim/40 backdrop-blur-[2px]", closing ? "animate-fade-out" : "animate-fade-in")} onClick={onClose} />
+      <div className={cn("absolute inset-0 bg-scrim/30", closing ? "animate-fade-out" : "animate-fade-in")} onClick={onClose} />
       <div
         ref={panelRef}
         role={closing ? undefined : "dialog"}
@@ -111,18 +111,18 @@ export function Modal(props: OverlayProps & { size?: "sm" | "md" | "lg" }) {
         data-overlay-panel={closing ? undefined : ""}
         tabIndex={-1}
         className={cn(
-          "relative flex max-h-[92dvh] w-full flex-col rounded-t-2xl border border-line bg-surface shadow-[var(--shadow-pop)] outline-none sm:rounded-card",
-          closing ? "animate-pop-out" : "animate-pop-in",
-          size === "sm" && "sm:max-w-[420px]",
-          size === "md" && "sm:max-w-[540px]",
-          size === "lg" && "sm:max-w-[760px]",
+          "relative flex max-h-[92dvh] w-full flex-col rounded-t-dialog border border-line bg-surface shadow-dialog outline-none sm:rounded-dialog",
+          closing ? "animate-dialog-out" : "animate-dialog-in",
+          size === "sm" && "sm:max-w-[400px]",
+          size === "md" && "sm:max-w-[520px]",
+          size === "lg" && "sm:max-w-[720px]",
           className,
         )}
       >
         <div className="flex items-start justify-between gap-4 border-b border-line px-5 py-4">
           <div className="min-w-0">
-            <h2 className="text-title-sm font-semibold tracking-[-0.01em] text-ink">{title}</h2>
-            {description && <p className="mt-0.5 text-small text-muted">{description}</p>}
+            <h2 className="text-h3 font-semibold tracking-[-0.01em] text-ink">{title}</h2>
+            {description && <p className="mt-0.5 text-label text-muted">{description}</p>}
           </div>
           <button
             onClick={onClose}
@@ -133,7 +133,7 @@ export function Modal(props: OverlayProps & { size?: "sm" | "md" | "lg" }) {
           </button>
         </div>
         <div className="scrollbar-thin flex-1 overflow-y-auto px-5 py-4">{children}</div>
-        {footer && <div className="flex flex-wrap items-center justify-end gap-2 border-t border-line bg-subtle px-5 py-3 sm:rounded-b-card">{footer}</div>}
+        {footer && <div className="flex flex-wrap items-center justify-end gap-2 border-t border-line bg-subtle px-5 py-3 sm:rounded-b-dialog">{footer}</div>}
       </div>
     </div>,
     document.body,
@@ -150,7 +150,7 @@ export function SlideOver(props: OverlayProps) {
   if (!mounted || !isClient) return null;
   return createPortal(
     <div className={cn("fixed inset-0 z-[70]", closing && "pointer-events-none")}>
-      <div className={cn("absolute inset-0 bg-scrim/35 backdrop-blur-[2px]", closing ? "animate-fade-out" : "animate-fade-in")} onClick={onClose} />
+      <div className={cn("absolute inset-0 bg-scrim/30", closing ? "animate-fade-out" : "animate-fade-in")} onClick={onClose} />
       <div
         ref={panelRef}
         role={closing ? undefined : "dialog"}
@@ -160,15 +160,15 @@ export function SlideOver(props: OverlayProps) {
         data-overlay-panel={closing ? undefined : ""}
         tabIndex={-1}
         className={cn(
-          "absolute inset-y-0 right-0 flex w-full max-w-[520px] flex-col border-l border-line bg-surface shadow-[var(--shadow-drawer)] outline-none",
+          "absolute inset-y-0 right-0 flex w-full max-w-[480px] flex-col border-l border-line bg-surface shadow-drawer outline-none",
           closing ? "animate-slide-out" : "animate-slide-in",
           className,
         )}
       >
         <div className="flex items-start justify-between gap-4 border-b border-line px-6 py-4">
           <div className="min-w-0">
-            <h2 className="text-title-sm font-semibold tracking-[-0.01em] text-ink">{title}</h2>
-            {description && <p className="mt-0.5 text-small text-muted">{description}</p>}
+            <h2 className="text-h3 font-semibold tracking-[-0.01em] text-ink">{title}</h2>
+            {description && <p className="mt-0.5 text-label text-muted">{description}</p>}
           </div>
           <button onClick={onClose} className="-mr-2 rounded-md p-1.5 text-muted transition hover:bg-hover hover:text-ink" aria-label="Close">
             <X className="h-4 w-4" />

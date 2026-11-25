@@ -110,7 +110,7 @@ export default function ReportsPage() {
   /* ----- Columns ----- */
   const stockColumns: Column<Product>[] = [
     { key: "product", header: "Product", sortValue: (p) => p.name, cell: (p) => <Link href={`/products/${p.id}`} className="font-medium text-ink hover:text-brand">{p.name}</Link> },
-    { key: "sku", header: "SKU", sortValue: (p) => p.sku, cell: (p) => <span className="font-mono text-small">{p.sku}</span> },
+    { key: "sku", header: "SKU", sortValue: (p) => p.sku, cell: (p) => <span className="font-mono text-label">{p.sku}</span> },
     { key: "category", header: "Category", sortValue: (p) => p.category, cell: (p) => p.category },
     { key: "qty", header: "Current qty", align: "right", sortValue: (p) => totalStock(p), cell: (p) => <span className="font-semibold text-ink tabular">{totalStock(p)}</span> },
     { key: "min", header: "Min qty", align: "right", sortValue: (p) => p.minStock, cell: (p) => <span className="tabular">{p.minStock}</span> },
@@ -145,14 +145,14 @@ export default function ReportsPage() {
     { key: "status", header: "Status", sortValue: (p) => productStatus(p), cell: (p) => <StatusBadge status={productStatus(p)} /> },
   ];
   const salesColumns: Column<Sale>[] = [
-    { key: "invoice", header: "Invoice", sortValue: (s) => s.invoiceNo, cell: (s) => <Link href={`/sales/${s.id}`} className="font-mono text-small font-medium text-ink hover:text-brand">{s.invoiceNo}</Link> },
+    { key: "invoice", header: "Invoice", sortValue: (s) => s.invoiceNo, cell: (s) => <Link href={`/sales/${s.id}`} className="font-mono text-label font-medium text-ink hover:text-brand">{s.invoiceNo}</Link> },
     { key: "customer", header: "Customer", sortValue: (s) => s.customerName, cell: (s) => s.customerName },
     { key: "date", header: "Date", sortValue: (s) => s.date, cell: (s) => formatDate(s.date) },
     { key: "revenue", header: "Revenue", align: "right", sortValue: (s) => (s.status === "Cancelled" ? 0 : s.total), cell: (s) => <span className={s.status === "Cancelled" ? "text-faint line-through tabular" : "font-semibold text-ink tabular"}>{formatCurrency(s.total)}</span> },
     { key: "payment", header: "Payment", sortValue: (s) => s.paymentStatus, cell: (s) => (s.status === "Cancelled" ? <StatusBadge status="Cancelled" /> : <StatusBadge status={s.paymentStatus} />) },
   ];
   const purchaseColumns: Column<Purchase>[] = [
-    { key: "po", header: "Purchase order", sortValue: (p) => p.poNumber, cell: (p) => <Link href={`/purchases/${p.id}`} className="font-mono text-small font-medium text-ink hover:text-brand">{p.poNumber}</Link> },
+    { key: "po", header: "Purchase order", sortValue: (p) => p.poNumber, cell: (p) => <Link href={`/purchases/${p.id}`} className="font-mono text-label font-medium text-ink hover:text-brand">{p.poNumber}</Link> },
     { key: "supplier", header: "Supplier", sortValue: (p) => p.supplierName, cell: (p) => p.supplierName },
     { key: "date", header: "Date", sortValue: (p) => p.orderDate, cell: (p) => formatDate(p.orderDate) },
     { key: "total", header: "Total amount", align: "right", sortValue: (p) => p.total, cell: (p) => <span className="font-semibold text-ink tabular">{formatCurrency(p.total)}</span> },
@@ -205,9 +205,9 @@ export default function ReportsPage() {
               <FilterSelect label="Date range" value={period} onChange={(v) => setPeriod(v as Period)} options={[...RANGE_PRESETS, { value: "custom", label: "Custom range…" }]} className="min-w-[150px]" />
               {period === "custom" && (
                 <div className="flex items-center gap-2">
-                  <input type="date" value={from} max={to} onChange={(e) => e.target.value && setFrom(e.target.value)} className="h-9 rounded-control border border-line-strong bg-surface px-2.5 text-body focus:border-brand focus:outline-none" aria-label="From date" />
+                  <input type="date" value={from} max={to} onChange={(e) => e.target.value && setFrom(e.target.value)} className="h-9 rounded-control border border-line-strong bg-surface px-2.5 text-body-sm focus:border-brand focus:outline-none" aria-label="From date" />
                   <span className="text-muted">–</span>
-                  <input type="date" value={to} min={from} onChange={(e) => e.target.value && setTo(e.target.value)} className="h-9 rounded-control border border-line-strong bg-surface px-2.5 text-body focus:border-brand focus:outline-none" aria-label="To date" />
+                  <input type="date" value={to} min={from} onChange={(e) => e.target.value && setTo(e.target.value)} className="h-9 rounded-control border border-line-strong bg-surface px-2.5 text-body-sm focus:border-brand focus:outline-none" aria-label="To date" />
                 </div>
               )}
             </>

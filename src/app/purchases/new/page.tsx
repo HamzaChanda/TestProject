@@ -124,7 +124,7 @@ function NewPurchaseInner() {
               </Field>
             </div>
             {supplier && (
-              <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 rounded-panel border border-line bg-subtle px-3.5 py-2.5 text-small">
+              <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 rounded-panel border border-line bg-subtle px-3.5 py-2.5 text-label">
                 <span className="text-muted">
                   Contact <span className="font-medium text-ink">{supplier.contactPerson}</span>
                 </span>
@@ -142,9 +142,9 @@ function NewPurchaseInner() {
             description="Quantities and agreed purchase prices."
             complete={fields.length > 0}
             actions={
-              <label className="flex items-center gap-2 text-small text-muted">
+              <label className="flex items-center gap-2 text-label text-muted">
                 <Warehouse className="h-3.5 w-3.5" /> Deliver to
-                <select {...register("warehouseId")} className="h-8 cursor-pointer rounded-control border border-line-strong bg-surface px-2 text-small text-ink focus:border-brand focus:outline-none">
+                <select {...register("warehouseId")} className="h-8 cursor-pointer rounded-control border border-line-strong bg-surface px-2 text-label text-ink focus:border-brand focus:outline-none">
                   {state.warehouses.map((w) => (
                     <option key={w.id} value={w.id}>
                       {w.name}
@@ -162,7 +162,7 @@ function NewPurchaseInner() {
               onPick={(p) => append({ productId: p.id, quantity: suggestedFor(p), price: p.costPrice })}
             />
             {lowFromSupplier.length > 0 && (
-              <div className="mt-3 flex flex-wrap items-center gap-2 rounded-panel border border-warning-line bg-warning-bg px-3 py-2 text-small text-warning">
+              <div className="mt-3 flex flex-wrap items-center gap-2 rounded-panel border border-warning-line bg-warning-bg px-3 py-2 text-label text-warning">
                 <Info className="h-4 w-4" />
                 <span>Low stock from this supplier:</span>
                 {lowFromSupplier.map((p) => (
@@ -183,7 +183,7 @@ function NewPurchaseInner() {
               </div>
             ) : (
               <div className="mt-3 overflow-hidden rounded-panel border border-line">
-                <div className="hidden grid-cols-[minmax(0,1fr)_100px_130px_110px_36px] gap-3 border-b border-line bg-subtle px-3.5 py-2 text-micro font-medium tracking-wide text-muted uppercase md:grid">
+                <div className="hidden grid-cols-[minmax(0,1fr)_100px_130px_110px_36px] gap-3 border-b border-line bg-subtle px-3.5 py-2 text-overline font-medium tracking-wide text-muted uppercase md:grid">
                   <span>Product</span>
                   <span>Quantity</span>
                   <span>Purchase price</span>
@@ -200,21 +200,21 @@ function NewPurchaseInner() {
                         <div className="col-span-2 flex min-w-0 items-center gap-3 md:col-span-1">
                           {p && <ProductThumb name={p.name} category={p.category} size={32} />}
                           <div className="min-w-0">
-                            <div className="truncate text-body font-medium text-ink">{p?.name}</div>
-                            <div className={cn("text-caption", p && stock <= p.minStock ? "text-warning" : "text-muted")}>
+                            <div className="truncate text-body-sm font-medium text-ink">{p?.name}</div>
+                            <div className={cn("text-label", p && stock <= p.minStock ? "text-warning" : "text-muted")}>
                               <span className="font-mono">{p?.sku}</span> · {stock} in stock · min {p?.minStock}
                             </div>
                           </div>
                         </div>
                         <div>
                           <Input type="number" min={1} step={1} inputMode="numeric" {...register(`items.${idx}.quantity`, { valueAsNumber: true })} invalid={!!errors.items?.[idx]?.quantity} className="tabular" />
-                          {errors.items?.[idx]?.quantity && <p className="mt-1 text-caption text-danger">{errors.items[idx]?.quantity?.message}</p>}
+                          {errors.items?.[idx]?.quantity && <p className="mt-1 text-label text-danger">{errors.items[idx]?.quantity?.message}</p>}
                         </div>
                         <div>
                           <Input type="number" min={0} step="0.01" leading={sym} {...register(`items.${idx}.price`, { valueAsNumber: true })} invalid={!!errors.items?.[idx]?.price} className="tabular" />
-                          {errors.items?.[idx]?.price && <p className="mt-1 text-caption text-danger">{errors.items[idx]?.price?.message}</p>}
+                          {errors.items?.[idx]?.price && <p className="mt-1 text-label text-danger">{errors.items[idx]?.price?.message}</p>}
                         </div>
-                        <div className="self-center text-right text-ui font-semibold text-ink tabular">{formatCurrency(lineTotal(Number(line?.quantity) || 0, Number(line?.price) || 0))}</div>
+                        <div className="self-center text-right text-body font-semibold text-ink tabular">{formatCurrency(lineTotal(Number(line?.quantity) || 0, Number(line?.price) || 0))}</div>
                         <button type="button" onClick={() => remove(idx)} className="grid h-8 w-8 place-items-center justify-self-end rounded-md text-muted transition hover:bg-danger-bg hover:text-danger" aria-label={`Remove ${p?.name}`}>
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -224,7 +224,7 @@ function NewPurchaseInner() {
                 </ul>
               </div>
             )}
-            {errors.items?.message && <p className="mt-2 text-small text-danger">{errors.items.message}</p>}
+            {errors.items?.message && <p className="mt-2 text-label text-danger">{errors.items.message}</p>}
           </FormSection>
 
           <FormSection step={3} title="Tax & notes" complete={!!supplier && fields.length > 0}>
@@ -245,15 +245,15 @@ function NewPurchaseInner() {
           </FormSection>
         </div>
 
-        <div className="xl:sticky xl:top-[76px] xl:self-start">
+        <div className="xl:sticky xl:top-[68px] xl:self-start">
           <Card className="overflow-hidden">
             <div className="border-b border-line px-5 py-4">
-              <h3 className="text-title-sm font-semibold text-ink">Order summary</h3>
-              <p className="text-small text-muted">
+              <h3 className="text-h3 font-semibold text-ink">Order summary</h3>
+              <p className="text-label text-muted">
                 {fields.length} product{fields.length === 1 ? "" : "s"} · {units} unit{units === 1 ? "" : "s"}
               </p>
             </div>
-            <dl className="space-y-2.5 px-5 py-4 text-body">
+            <dl className="space-y-2.5 px-5 py-4 text-body-sm">
               <div className="flex justify-between">
                 <dt className="text-muted">Subtotal</dt>
                 <dd className="font-medium tabular">{formatCurrency(totals.subtotal)}</dd>
@@ -263,11 +263,11 @@ function NewPurchaseInner() {
                 <dd className="font-medium tabular">{formatCurrency(totals.taxAmount)}</dd>
               </div>
               <div className="flex items-baseline justify-between border-t border-line pt-3">
-                <dt className="text-ui font-semibold text-ink">Total amount</dt>
-                <dd className="text-[20px] font-semibold tracking-[-0.01em] text-ink tabular">{formatCurrency(totals.total)}</dd>
+                <dt className="text-body font-semibold text-ink">Total amount</dt>
+                <dd className="text-h2 font-semibold tracking-[-0.01em] text-ink tabular">{formatCurrency(totals.total)}</dd>
               </div>
             </dl>
-            <div className="mx-5 mb-4 flex gap-2 rounded-panel bg-info-bg px-3 py-2.5 text-small text-info">
+            <div className="mx-5 mb-4 flex gap-2 rounded-panel bg-info-bg px-3 py-2.5 text-label text-info">
               <Info className="mt-px h-4 w-4 shrink-0" />
               Inventory increases only when you receive items on this order.
             </div>

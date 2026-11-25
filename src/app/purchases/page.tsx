@@ -1,7 +1,8 @@
 "use client";
 
 import { useNavigate } from "@/hooks/useNavigate";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 import { Ban, CheckCircle2, ClipboardList, Clock, Download, Eye, MoreHorizontal, PackageCheck, Plus, Send, ShoppingCart, Trash2, Wallet } from "lucide-react";
@@ -22,11 +23,25 @@ import { ReceivePurchaseDialog } from "@/components/inventory/ReceivePurchaseDia
 
 const STATUSES = ["Draft", "Pending", "Partially Received", "Received", "Cancelled"] as const;
 
+const STATUS_PARAMS = ["all", "open", "overdue", ...STATUSES] as readonly string[];
+
 export default function PurchasesPage() {
+  return (
+    <Suspense>
+      <PurchasesPageInner />
+    </Suspense>
+  );
+}
+
+function PurchasesPageInner() {
   const { state, actions } = useInventory();
   const navigate = useNavigate();
+  const params = useSearchParams();
   const [query, setQuery] = useState("");
-  const [status, setStatus] = useState<string>("all");
+  const [status, setStatus] = useState<string>(() => {
+    const v = params.get("status");
+    return v && STATUS_PARAMS.includes(v) ? v : "all";
+  });
   const [supplier, setSupplier] = useState("all");
   const [period, setPeriod] = useState<RangePreset | "all">("all");
   const [receiving, setReceiving] = useState<Purchase | null>(null);
@@ -40,7 +55,8 @@ export default function PurchasesPage() {
       const d = parseISO(p.orderDate);
       return (
         (!q || p.poNumber.toLowerCase().includes(q) || p.supplierName.toLowerCase().includes(q)) &&
-        (status === "all" || (status === "open" ? p.status === "Pending" || p.status === "Partially Received" : p.status === status)) &&
+        (status === "all" ||
+          (status === "open" ? p.status === "Pending" || p.status === "Partially Received" : status === "overdue" ? isOverdue(p) : p.status === status)) &&
         (supplier === "all" || p.supplierId === supplier) &&
         (!range || (d >= range.from && d <= range.to))
       );
@@ -56,7 +72,7 @@ export default function PurchasesPage() {
       header: "Purchase order",
       sortValue: (p) => p.poNumber,
       cell: (p) => (
-        <Link href={`/purchases/${p.id}`} onClick={(e) => e.stopPropagation()} className="font-mono text-small font-medium text-ink hover:text-brand">
+        <Link href={`/purchases/${p.id}`} onClick={(e) => e.stopPropagation()} className="font-mono text-label font-medium text-ink hover:text-brand">
           {p.poNumber}
         </Link>
       ),
@@ -70,7 +86,7 @@ export default function PurchasesPage() {
       cell: (p) => (
         <div className="leading-tight">
           <div className={cn(isOverdue(p) && "font-medium text-danger")}>{formatDate(p.expectedDate)}</div>
-          {isOverdue(p) && <div className="mt-0.5 text-micro font-medium text-danger">Overdue</div>}
+          {isOverdue(p) && <div className="mt-0.5 text-overline font-medium text-danger">Overdue</div>}
         </div>
       ),
     },
@@ -82,14 +98,14 @@ export default function PurchasesPage() {
         const pr = purchaseProgress(p);
         return (
           <div className="w-[92px]">
-            <div className="mb-1 flex justify-between text-caption tabular">
+            <div className="mb-1 flex justify-between text-label tabular">
               <span className="text-ink-2">
                 {pr.received}/{pr.ordered}
               </span>
               <span className="text-muted">{pr.pct}%</span>
             </div>
             <div className="h-1.5 overflow-hidden rounded-full bg-pressed">
-              <div className={cn("h-full rounded-full", pr.pct === 100 ? "bg-success-solid" : "bg-info")} style={{ width: `${pr.pct}%` }} />
+              <div className={cn("h-full rounded-full", pr.pct === 100 ? "bg-success-solid" : "bg-info-solid")} style={{ width: `${pr.pct}%` }} />
             </div>
           </div>
         );
@@ -189,6 +205,7 @@ export default function PurchasesPage() {
             options={[
               { value: "all", label: "All", count: state.purchases.length },
               { value: "open", label: "Open", count: summary.pending },
+              { value: "overdue", label: "Overdue", count: state.purchases.filter((p) => isOverdue(p)).length },
               ...STATUSES.map((s) => ({ value: s, label: s, count: counts[s] })),
             ]}
           />

@@ -56,7 +56,7 @@ function CustomersInner() {
           <Avatar name={c.name} size={32} />
           <span className="min-w-0">
             <span className="block max-w-[200px] truncate font-medium text-ink hover:text-brand">{c.name}</span>
-            <span className="block max-w-[200px] truncate text-small text-muted">{c.company || c.city}</span>
+            <span className="block max-w-[200px] truncate text-label text-muted">{c.company || c.city}</span>
           </span>
         </Link>
       ),
@@ -72,7 +72,7 @@ function CustomersInner() {
       cell: (c) => (
         <div>
           <div className="font-semibold text-ink tabular">{formatCurrency(c.stats.spent)}</div>
-          {c.stats.outstanding > 0 && <div className="text-caption text-danger tabular">{formatCurrency(c.stats.outstanding)} due</div>}
+          {c.stats.outstanding > 0 && <div className="text-label text-danger tabular">{formatCurrency(c.stats.outstanding)} due</div>}
         </div>
       ),
     },

@@ -130,16 +130,16 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search products, SKUs, invoices, customers, suppliers…"
-            className="h-[52px] flex-1 bg-transparent text-title-sm text-ink placeholder:text-faint focus:outline-none"
+            className="h-[52px] flex-1 bg-transparent text-h3 text-ink placeholder:text-faint focus:outline-none"
             aria-label="Search"
           />
-          <kbd className="rounded border border-line bg-subtle px-1.5 py-px text-micro font-medium text-muted">Esc</kbd>
+          <kbd className="rounded border border-line bg-subtle px-1.5 py-px text-overline font-medium text-muted">Esc</kbd>
         </div>
         <div ref={listRef} className="scrollbar-thin max-h-[min(420px,60vh)] overflow-y-auto p-1.5">
           {results.length === 0 ? (
             <div className="px-4 py-10 text-center">
-              <div className="text-ui font-medium text-ink">No results for “{query}”</div>
-              <div className="mt-1 text-small text-muted">Try a product name, SKU, invoice number or customer.</div>
+              <div className="text-body font-medium text-ink">No results for “{query}”</div>
+              <div className="mt-1 text-label text-muted">Try a product name, SKU, invoice number or customer.</div>
             </div>
           ) : (
             results.map((r, i) => {
@@ -147,7 +147,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
               lastGroup = r.group;
               return (
                 <div key={`${r.group}-${r.id}`}>
-                  {header && <div className="px-2.5 pt-2.5 pb-1 text-micro font-semibold tracking-wide text-faint uppercase">{header}</div>}
+                  {header && <div className="px-2.5 pt-2.5 pb-1 text-overline font-semibold tracking-wide text-faint uppercase">{header}</div>}
                   <button
                     data-index={i}
                     onMouseMove={() => setIndex(i)}
@@ -159,8 +159,8 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
                   >
                     <span className={cn("grid h-7 w-7 shrink-0 place-items-center rounded-control border border-line bg-surface", i === index ? "text-brand" : "text-muted")}>{r.icon}</span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-ui font-medium">{r.label}</span>
-                      {r.sub && <span className="block truncate text-small text-muted">{r.sub}</span>}
+                      <span className="block truncate text-body font-medium">{r.label}</span>
+                      {r.sub && <span className="block truncate text-label text-muted">{r.sub}</span>}
                     </span>
                     {i === index ? <CornerDownLeft className="text-brand" /> : <ArrowRight className="text-faint opacity-0" />}
                   </button>
@@ -169,7 +169,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
             })
           )}
         </div>
-        <div className="flex items-center gap-4 border-t border-line bg-subtle px-4 py-2 text-caption text-muted">
+        <div className="flex items-center gap-4 border-t border-line bg-subtle px-4 py-2 text-label text-muted">
           <span>↑↓ to navigate</span>
           <span>↵ to open</span>
           <span className="ml-auto hidden sm:inline">Searches live inventory data</span>

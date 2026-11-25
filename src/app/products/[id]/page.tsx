@@ -48,9 +48,9 @@ export default function ProductDetailPage() {
       <PageHeader
         meta={
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-md bg-fill px-1.5 py-0.5 font-mono text-small text-ink-2">{product.sku}</span>
+            <span className="rounded-md bg-fill px-1.5 py-0.5 font-mono text-label text-ink-2">{product.sku}</span>
             <StatusBadge status={status} />
-            <span className="text-small text-muted">{product.category}</span>
+            <span className="text-label text-muted">{product.category}</span>
           </div>
         }
         title={
@@ -113,7 +113,7 @@ export default function ProductDetailPage() {
                 </dl>
                 {advice.suggestedQty > 0 ? (
                   <div className="mt-4 flex items-center justify-between gap-3 rounded-panel bg-warning-bg px-3.5 py-3">
-                    <p className="text-small text-ink-2">
+                    <p className="text-label text-ink-2">
                       Order <span className="font-semibold text-ink tabular">{advice.suggestedQty}</span> {product.unit} to restore {advice.targetLevel}.
                     </p>
                     <ButtonLink href={`/purchases/new?product=${product.id}&qty=${advice.suggestedQty}`} size="sm" icon={<ShoppingCart className="h-3.5 w-3.5" />}>
@@ -121,7 +121,7 @@ export default function ProductDetailPage() {
                     </ButtonLink>
                   </div>
                 ) : (
-                  <p className="mt-4 rounded-panel bg-success-bg px-3.5 py-3 text-small text-success">Stock and open orders cover the target level. No order needed.</p>
+                  <p className="mt-4 rounded-panel bg-success-bg px-3.5 py-3 text-label text-success">Stock and open orders cover the target level. No order needed.</p>
                 )}
               </CardBody>
             </Card>
@@ -134,9 +134,9 @@ export default function ProductDetailPage() {
                 const q = product.stock[w.id] ?? 0;
                 return (
                   <div key={w.id}>
-                    <div className="mb-1.5 flex items-baseline justify-between text-body">
+                    <div className="mb-1.5 flex items-baseline justify-between text-body-sm">
                       <span className="text-ink-2">
-                        {w.name} <span className="text-caption text-faint">· {w.location}</span>
+                        {w.name} <span className="text-label text-faint">· {w.location}</span>
                       </span>
                       <span className="font-semibold text-ink tabular">{q}</span>
                     </div>
@@ -147,7 +147,7 @@ export default function ProductDetailPage() {
                 );
               })}
               <div className="border-t border-line pt-3">
-                <div className="mb-1.5 flex justify-between text-small text-muted">
+                <div className="mb-1.5 flex justify-between text-label text-muted">
                   <span>Total vs. minimum ({product.minStock})</span>
                   <span>Last updated {formatDate(getLastStockUpdate(state, product.id))}</span>
                 </div>
@@ -193,14 +193,14 @@ export default function ProductDetailPage() {
                 {openPOs.map((po) => {
                   const line = po.items.find((i) => i.productId === id)!;
                   return (
-                    <Link key={po.id} href={`/purchases/${po.id}`} className="flex items-center justify-between rounded-panel border border-line px-3 py-2.5 text-body transition hover:border-brand/40 hover:bg-brand-50/30">
+                    <Link key={po.id} href={`/purchases/${po.id}`} className="flex items-center justify-between rounded-panel border border-line px-3 py-2.5 text-body-sm transition hover:border-brand/40 hover:bg-brand-50/30">
                       <span>
                         <span className="font-mono font-medium text-ink">{po.poNumber}</span>
-                        <span className="block text-small text-muted">{po.supplierName}</span>
+                        <span className="block text-label text-muted">{po.supplierName}</span>
                       </span>
                       <span className="text-right">
                         <span className="font-semibold text-info tabular">+{line.quantity - line.receivedQty}</span>
-                        <span className="block text-caption text-muted">due {formatDate(po.expectedDate, "dd MMM")}</span>
+                        <span className="block text-label text-muted">due {formatDate(po.expectedDate, "dd MMM")}</span>
                       </span>
                     </Link>
                   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { useNavigate } from "@/hooks/useNavigate";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { AlertTriangle, ArrowLeftRight, Boxes, Download, Eye, History, MoreHorizontal, PackageX, ShoppingCart, SlidersHorizontal, Wallet } from "lucide-react";
@@ -31,7 +31,13 @@ function StockPageInner() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [status, setStatus] = useState(params.get("status") ?? "all");
-  const [warehouse, setWarehouse] = useState("all");
+  const whParam = params.get("warehouse");
+  const whIds = state.warehouses.map((w) => w.id).join(",");
+  const [warehouse, setWarehouse] = useState(() => (whParam && whIds.split(",").includes(whParam) ? whParam : "all"));
+  // Sidebar "Locations" links change only the query string; follow them while mounted.
+  useEffect(() => {
+    if (whParam !== null) setWarehouse(whIds.split(",").includes(whParam) ? whParam : "all");
+  }, [whParam, whIds]);
   const [type, setType] = useState("all");
   const [period, setPeriod] = useState<RangePreset | "all">("all");
   const [adjust, setAdjust] = useState<{ open: boolean; productId?: string }>({ open: false });
@@ -78,7 +84,7 @@ function StockPageInner() {
         </Link>
       ),
     },
-    { key: "sku", header: "SKU", sortValue: (p) => p.sku, cell: (p) => <span className="font-mono text-small">{p.sku}</span> },
+    { key: "sku", header: "SKU", sortValue: (p) => p.sku, cell: (p) => <span className="font-mono text-label">{p.sku}</span> },
     { key: "category", header: "Category", sortValue: (p) => p.category, cell: (p) => p.category, hideOnMobile: true, hideBelow: "wide" },
     ...state.warehouses.map(
       (w): Column<Product> => ({
@@ -98,7 +104,7 @@ function StockPageInner() {
       sortValue: (p) => qtyIn(p),
       cell: (p) => (
         <span className="font-semibold text-ink tabular">
-          {qtyIn(p)} <span className="text-small font-normal text-muted">{p.unit}</span>
+          {qtyIn(p)} <span className="text-label font-normal text-muted">{p.unit}</span>
         </span>
       ),
     },
@@ -278,7 +284,7 @@ function StockPageInner() {
             onRowClick={(p) => navigate(`/products/${p.id}`)}
             resetKey={`${query}|${category}|${status}|${warehouse}`}
             mobileTrailing="status"
-            rowClassName={(p) => (productStatus(p) === "Out of Stock" ? "bg-row-danger" : productStatus(p) === "Low Stock" ? "bg-row-warning" : undefined)}
+            rowTone={(p) => (productStatus(p) === "Out of Stock" ? "danger" : productStatus(p) === "Low Stock" ? "warning" : undefined)}
             initialSort={{ key: "current", dir: "asc" }}
             empty={<EmptyState icon={<Boxes />} title="No products match" description="Adjust your search or filters to see stock levels." />}
           />

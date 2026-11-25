@@ -40,13 +40,5 @@ export const TAX_PRESETS = [0, 5, 12, 18, 28];
 
 export const PAGE_SIZE = 10;
 
-/** Categorical chart palette — validated for CVD separation (brand indigo in slot 1). */
-export const CHART_COLORS = [
-  "#635BFF",
-  "#EB6834",
-  "#1BAF7A",
-  "#EDA100",
-  "#E87BA4",
-  "#2A78D6",
-  "#008300",
-];
+/** Categorical chart palette — mirrors --color-chart-1…6 in globals.css (CVD-validated, fixed order). */
+export const CHART_COLORS = ["#0A9384", "#D9721F", "#3F6FD8", "#C8507E", "#7E9A1F", "#7B61C9"];

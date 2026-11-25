@@ -61,7 +61,7 @@ function SuppliersInner() {
           </span>
           <span className="min-w-0">
             <span className="block max-w-[220px] truncate font-medium text-ink hover:text-brand">{s.name}</span>
-            <span className="block text-small text-muted">
+            <span className="block text-label text-muted">
               {s.city} · {s.paymentTerms}
             </span>
           </span>

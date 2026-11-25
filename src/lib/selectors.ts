@@ -4,7 +4,11 @@
  */
 import {
   differenceInCalendarDays,
+  eachDayOfInterval,
+  eachMonthOfInterval,
+  eachWeekOfInterval,
   endOfDay,
+  endOfWeek,
   endOfMonth,
   format,
   isAfter,
@@ -255,6 +259,17 @@ export function getSalesSummary(sales: Sale[]) {
   };
 }
 
+/** An invoice is overdue once it has been unpaid for this many days (same rule as notifications). */
+export const PAYMENT_OVERDUE_DAYS = 7;
+
+export function saleAgeDays(s: Sale, now = new Date()) {
+  return differenceInCalendarDays(now, parseISO(s.date));
+}
+
+export function isSaleOverdue(s: Sale, now = new Date()) {
+  return s.status !== "Cancelled" && s.paymentStatus !== "Paid" && saleAgeDays(s, now) >= PAYMENT_OVERDUE_DAYS;
+}
+
 /* ------------------------------ Purchases ------------------------------ */
 
 export function receivedValue(p: Purchase) {
@@ -357,7 +372,7 @@ export function getNotifications(state: InventoryState): AppNotification[] {
     }
   }
   for (const s of state.sales) {
-    if (s.status !== "Cancelled" && s.paymentStatus !== "Paid" && differenceInCalendarDays(new Date(), parseISO(s.date)) >= 7) {
+    if (isSaleOverdue(s)) {
       list.push({
         id: `due-${s.id}-${s.amountPaid}`,
         group: "Payments",
@@ -412,4 +427,125 @@ export function getWarehouseStats(state: InventoryState) {
     }
     return { ...w, units, value: round2(value), skus };
   });
+}
+
+/* ------------------------------ Dashboard v2 ----------------------------- */
+
+/** What needs action today. Same rules as notifications, aggregated. */
+export function getAttentionSummary(state: InventoryState, now = new Date()) {
+  let out = 0;
+  let low = 0;
+  for (const p of state.products) {
+    const st = productStatus(p);
+    if (st === "Out of Stock") out++;
+    else if (st === "Low Stock") low++;
+  }
+  const overduePOs = state.purchases.filter((p) => isOverdue(p, now));
+  const overdueSales = state.sales.filter((s) => isSaleOverdue(s, now));
+  return {
+    out,
+    low,
+    overduePOs: overduePOs.length,
+    overduePOValue: round2(overduePOs.reduce((sum, p) => sum + p.total - receivedValue(p), 0)),
+    overdueSales: overdueSales.length,
+    overdueAmount: round2(overdueSales.reduce((sum, s) => sum + (s.total - s.amountPaid), 0)),
+  };
+}
+
+export type PerformancePreset = "7d" | "30d" | "month" | "90d" | "6m";
+
+export const PERFORMANCE_PRESETS: { value: PerformancePreset; label: string; long: string }[] = [
+  { value: "7d", label: "7D", long: "last 7 days" },
+  { value: "30d", label: "30D", long: "last 30 days" },
+  { value: "month", label: "MTD", long: "month to date" },
+  { value: "90d", label: "90D", long: "last 90 days" },
+  { value: "6m", label: "6M", long: "last 6 months" },
+];
+
+const purchaseSpend = (p: Purchase) =>
+  isCommittedPurchase(p) ? p.total : p.status === "Cancelled" && p.items.some((i) => i.receivedQty > 0) ? receivedValue(p) : 0;
+
+/**
+ * Everything the dashboard Performance section shows for one range:
+ * headline figures (with deltas against the previous equal window),
+ * a bucketed sales-vs-purchases series (day / week / month by range length)
+ * and revenue by category. Cancelled invoices are excluded throughout.
+ */
+export function getPerformance(state: InventoryState, preset: PerformancePreset, now = new Date()) {
+  const range = rangeFromPreset(preset, now);
+  const prev = previousRange(range);
+  const sales = state.sales.filter((s) => isActiveSale(s) && inRange(s.date, range));
+  const prevSales = state.sales.filter((s) => isActiveSale(s) && inRange(s.date, prev));
+  const purchases = state.purchases.filter((p) => inRange(p.orderDate, range));
+  const prevPurchases = state.purchases.filter((p) => inRange(p.orderDate, prev));
+
+  const sum = <T,>(xs: T[], f: (x: T) => number) => round2(xs.reduce((a, x) => a + f(x), 0));
+  const revenue = sum(sales, (s) => s.total);
+  const prevRevenue = sum(prevSales, (s) => s.total);
+  const units = sales.reduce((a, s) => a + s.items.reduce((b, i) => b + i.quantity, 0), 0);
+  const prevUnits = prevSales.reduce((a, s) => a + s.items.reduce((b, i) => b + i.quantity, 0), 0);
+  const spend = sum(purchases, purchaseSpend);
+  const prevSpend = sum(prevPurchases, purchaseSpend);
+  const avg = sales.length ? round2(revenue / sales.length) : 0;
+  const prevAvg = prevSales.length ? round2(prevRevenue / prevSales.length) : 0;
+
+  const unit: "day" | "week" | "month" = preset === "90d" ? "week" : preset === "6m" ? "month" : "day";
+  const starts =
+    unit === "day"
+      ? eachDayOfInterval({ start: range.from, end: range.to })
+      : unit === "week"
+        ? eachWeekOfInterval({ start: range.from, end: range.to }, { weekStartsOn: 1 })
+        : eachMonthOfInterval({ start: range.from, end: range.to });
+  const buckets = starts.map((start) => {
+    const s0 = unit === "week" && start < range.from ? range.from : start;
+    const end = unit === "day" ? endOfDay(start) : unit === "week" ? endOfWeek(start, { weekStartsOn: 1 }) : endOfMonth(start);
+    return {
+      key: start.toISOString(),
+      label: format(s0, unit === "month" ? "MMM" : "d MMM"),
+      fullLabel: unit === "day" ? format(s0, "EEE, d MMM yyyy") : unit === "week" ? `Week of ${format(s0, "d MMM")}` : format(s0, "MMMM yyyy"),
+      start: s0,
+      end: end > range.to ? range.to : end,
+      sales: 0,
+      purchases: 0,
+      orders: 0,
+    };
+  });
+  const bucketOf = (iso: string) => {
+    const d = parseISO(iso);
+    return buckets.find((b) => d >= b.start && d <= b.end);
+  };
+  for (const s of sales) {
+    const b = bucketOf(s.date);
+    if (b) {
+      b.sales += s.total;
+      b.orders += 1;
+    }
+  }
+  for (const p of purchases) {
+    const b = bucketOf(p.orderDate);
+    if (b) b.purchases += purchaseSpend(p);
+  }
+  const series = buckets.map((b) => ({ ...b, sales: round2(b.sales), purchases: round2(b.purchases) }));
+
+  const categoryOf = new Map(state.products.map((p) => [p.id, p.category]));
+  const cat = new Map<string, number>();
+  for (const s of sales) for (const i of s.items) cat.set(categoryOf.get(i.productId) ?? "Other", (cat.get(categoryOf.get(i.productId) ?? "Other") ?? 0) + i.total);
+  const categories = [...cat.entries()].map(([category, value]) => ({ category, value: round2(value) })).sort((a, b) => b.value - a.value);
+
+  return {
+    range,
+    unit,
+    revenue,
+    revenueDelta: pctChange(revenue, prevRevenue),
+    orders: sales.length,
+    ordersDelta: pctChange(sales.length, prevSales.length),
+    avgOrder: avg,
+    avgOrderDelta: pctChange(avg, prevAvg),
+    units,
+    unitsDelta: pctChange(units, prevUnits),
+    spend,
+    spendDelta: pctChange(spend, prevSpend),
+    series,
+    categories,
+  };
 }

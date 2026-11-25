@@ -1,81 +1,126 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  /* ================= Stock Ledger design tokens =================
+     Single source of truth. Values are from the Stock Ledger spec;
+     every text pairing below was contrast-checked (≥ 5.48:1). */
 
-  --color-canvas: #f7f8fa;
+  /* ---- Typography: IBM Plex (next/font variables set in layout.tsx) ---- */
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-cond: var(--font-plex-cond), var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Type roles (size / line-height). Use only these. */
+  --text-overline: 11px;   --text-overline--line-height: 14px;
+  --text-label: 12px;      --text-label--line-height: 16px;
+  --text-code: 12.5px;     --text-code--line-height: 18px;
+  --text-body-sm: 13px;    --text-body-sm--line-height: 18px;
+  --text-body: 14px;       --text-body--line-height: 20px;
+  --text-h3: 15px;         --text-h3--line-height: 20px;
+  --text-h2: 18px;         --text-h2--line-height: 24px;
+  --text-h1: 24px;         --text-h1--line-height: 30px;
+  --text-display: 32px;    --text-display--line-height: 38px;
+
+  /* ---- Neutrals (graphite, slight green bias) ---- */
+  --color-canvas: #f5f6f4;
   --color-surface: #ffffff;
-  --color-subtle: #fafbfc;
-  --color-ink: #17191f;
-  --color-ink-2: #3b3f4a;
-  /* Contrast-checked: muted 5.1:1, faint 3.4:1 on white (previously 4.36:1 / 2.43:1). */
-  --color-muted: #696e7b;
-  --color-faint: #868b98;
-  --color-line: #e9ebf0;
-  --color-line-strong: #dcdfe6;
-  --color-line-hover: #cbd0d9;
+  --color-subtle: #fafbfa;
+  --color-sunken: #eef0ee;
+  --color-line: #e2e6e3;
+  --color-line-strong: #d2d8d4;
+  --color-line-hover: #b9c1bd;
+  --color-control: #8a938f; /* input borders: 3.16:1 (WCAG 1.4.11) */
+  --color-ink: #111614;
+  --color-ink-2: #3a423f;
+  --color-muted: #5c6662; /* 5.95:1 */
+  --color-faint: #89928e; /* icons / placeholders only, never information */
+  --color-scrim: #111614;
+  /* Role aliases (one value per role) */
+  --color-fill: #eef0ee;
+  --color-hover: #eef0ee;
+  --color-pressed: #e2e6e3;
+  --color-row-hover: #fafbfa;
 
-  /* Neutral fills by role (one value per role instead of 7 near-identical greys). */
-  --color-fill: #f2f3f6; /* chips, neutral badges */
-  --color-hover: #f3f4f7; /* hover backgrounds */
-  --color-pressed: #eceef2; /* tracks, segmented controls, pressed */
-  --color-scrim: #0f1220; /* modal / drawer backdrop */
+  /* ---- Ledger Petrol (accent) ---- */
+  --color-petrol-50: #e7f3f0;
+  --color-petrol-100: #cde7e1;
+  --color-petrol-500: #0e6b5f;
+  --color-petrol-600: #0a574d;
+  --color-petrol-700: #08473f;
+  --color-brand: #0e6b5f;
+  --color-brand-hover: #0a574d;
+  --color-brand-50: #e7f3f0;
+  --color-brand-100: #cde7e1;
+  --color-brand-700: #08473f;
 
-  --color-brand: #635bff;
-  --color-brand-hover: #5148e5;
-  --color-brand-50: #f3f2ff;
-  --color-brand-100: #e6e4ff;
-  --color-brand-700: #4338ca;
+  /* ---- Signal Amber: attention marks only, never text ---- */
+  --color-signal: #e8a317;
 
-  --color-success: #15803d;
-  --color-success-solid: #22a157;
-  --color-success-bg: #ecfdf3;
-  --color-success-line: #c6f0d6;
-  --color-warning: #b45309;
-  --color-warning-solid: #f59e0b;
-  --color-warning-bg: #fff8eb;
-  --color-warning-line: #fbe3b4;
-  --color-danger: #d92d20;
-  --color-danger-bg: #fef3f2;
-  --color-danger-line: #fcd4d0;
-  --color-info: #1d6fd8;
-  --color-info-bg: #eff6ff;
-  --color-info-line: #cfe2fc;
+  /* ---- Semantic: text / bg / line / solid ---- */
+  --color-success: #18663a;
+  --color-success-bg: #eaf6ee;
+  --color-success-line: #c5e7d2;
+  --color-success-solid: #22a15a;
+  --color-warning: #8a4a06;
+  --color-warning-bg: #fef4e2;
+  --color-warning-line: #f7ddb0;
+  --color-warning-solid: #e8a317;
+  --color-danger: #a4261c;
+  --color-danger-bg: #fdefed;
+  --color-danger-line: #f6cfcb;
+  --color-danger-solid: #d92d20;
+  --color-info: #1f5aa6;
+  --color-info-bg: #edf3fb;
+  --color-info-line: #cadcf3;
+  --color-info-solid: #3f6fd8;
 
-  /* Radius scale tied to elevation: controls < inner panels < raised surfaces. */
-  --radius-control: 8px;
+  /* ---- Chart series (fixed order, CVD-validated on the canvas) ---- */
+  --color-chart-1: #0a9384;
+  --color-chart-2: #d9721f;
+  --color-chart-3: #3f6fd8;
+  --color-chart-4: #c8507e;
+  --color-chart-5: #7e9a1f;
+  --color-chart-6: #7b61c9;
+
+  /* ---- Radius: tags < controls < sheets/menus < dialogs ---- */
+  --radius-tag: 4px;
+  --radius-control: 6px;
   --radius-panel: 10px;
-  --radius-card: 12px;
+  --radius-card: 10px;
+  --radius-dialog: 14px;
 
-  /* Type roles (font-size only; line-height comes from context). */
-  --text-micro: 11px;
-  --text-caption: 11.5px;
-  --text-small: 12.5px;
-  --text-body: 13px;
-  --text-ui: 13.5px;
-  --text-title-sm: 14.5px;
-  --text-title: 16px;
-  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 1px rgba(16, 24, 40, 0.02);
-  --shadow-pop: 0 12px 32px -8px rgba(16, 24, 40, 0.16), 0 4px 8px -4px rgba(16, 24, 40, 0.06);
-  --shadow-drawer: -16px 0 48px -12px rgba(16, 24, 40, 0.18);
+  /* ---- Elevation: sheets are flat; only floating layers cast shadows ---- */
+  --shadow-xs: 0 1px 1px rgba(17, 22, 20, 0.05);
+  --shadow-card: none;
+  --shadow-pop: 0 8px 24px -6px rgba(17, 22, 20, 0.16), 0 2px 6px -2px rgba(17, 22, 20, 0.08);
+  --shadow-dialog: 0 24px 48px -12px rgba(17, 22, 20, 0.24);
+  --shadow-drawer: -16px 0 48px -12px rgba(17, 22, 20, 0.2);
 
-  /* Opaque row tints, so sticky table cells can inherit them. */
-  --color-row-danger: #fef8f7;
-  --color-row-warning: #fffbf2;
-  --color-row-hover: #fafbfd;
+  /* ---- Spacing (4px base) — Tailwind's default 4px scale is the source;
+          named roles for layout: ---- */
+  --spacing-gutter: 24px;
+  --spacing-section: 32px;
+  --spacing-header: 52px;
+  --spacing-sidebar: 232px;
+  --spacing-rail: 60px;
 
-  /* Motion system: short, ease-out, no bounce. Enter ≈ 160–220ms, exit ≈ 120–160ms. */
-  --ease-out-soft: cubic-bezier(0.22, 0.8, 0.36, 1);
-  --animate-fade-in: fade-in 160ms ease-out;
-  --animate-fade-out: fade-out 140ms ease-in forwards;
-  --animate-pop-in: pop-in 160ms var(--ease-out-soft);
-  --animate-pop-out: pop-out 120ms ease-in forwards;
-  --animate-slide-in: slide-in 220ms var(--ease-out-soft);
-  --animate-slide-out: slide-out 160ms ease-in forwards;
-  --animate-slide-in-left: slide-in-left 220ms var(--ease-out-soft);
-  --animate-slide-out-left: slide-out-left 160ms ease-in forwards;
-  --animate-page-in: page-in 200ms var(--ease-out-soft) backwards;
+  /* ---- Motion ---- */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out-soft: cubic-bezier(0.2, 0, 0, 1);
+  --animate-fade-in: fade-in 160ms var(--ease-standard);
+  --animate-fade-out: fade-out 110ms var(--ease-exit) forwards;
+  --animate-pop-in: pop-in 160ms var(--ease-standard);
+  --animate-pop-out: pop-out 110ms var(--ease-exit) forwards;
+  --animate-dialog-in: dialog-in 200ms var(--ease-standard);
+  --animate-dialog-out: pop-out 140ms var(--ease-exit) forwards;
+  --animate-slide-in: slide-in 240ms var(--ease-standard);
+  --animate-slide-out: slide-out 170ms var(--ease-exit) forwards;
+  --animate-slide-in-left: slide-in-left 240ms var(--ease-standard);
+  --animate-slide-out-left: slide-out-left 170ms var(--ease-exit) forwards;
+  --animate-slide-up: slide-up 240ms var(--ease-standard);
+  --animate-page-in: page-in 200ms var(--ease-standard) backwards;
+  --animate-flash: value-flash 600ms var(--ease-standard);
 
   @keyframes fade-in {
     from { opacity: 0; }
@@ -92,6 +137,18 @@
   @keyframes pop-out {
     from { opacity: 1; transform: translateY(0) scale(1); }
     to { opacity: 0; transform: translateY(2px) scale(0.985); }
+  }
+  @keyframes dialog-in {
+    from { opacity: 0; transform: scale(0.98); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes slide-up {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  @keyframes value-flash {
+    0% { background-color: var(--color-petrol-50); }
+    100% { background-color: transparent; }
   }
   @keyframes page-in {
     from { opacity: 0; transform: translateY(4px); }
@@ -132,7 +189,8 @@
     background: var(--color-canvas);
     color: var(--color-ink);
     font-family: var(--font-sans);
-    font-feature-settings: "cv11", "ss01";
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
     overflow-x: hidden;
   }
   ::selection {

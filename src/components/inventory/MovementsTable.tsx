@@ -56,7 +56,7 @@ export function MovementsTable({
       cell: (m) => (
         <div>
           <div className="text-ink">{formatDate(m.date)}</div>
-          <div className="text-caption text-muted">{formatDate(m.date, "h:mm a")}</div>
+          <div className="text-label text-muted">{formatDate(m.date, "h:mm a")}</div>
         </div>
       ),
     },
@@ -77,7 +77,7 @@ export function MovementsTable({
                   ) : (
                     <span className="block max-w-[200px] truncate font-medium text-ink-2">{m.productName}</span>
                   )}
-                  <span className="font-mono text-caption text-muted">{m.sku}</span>
+                  <span className="font-mono text-label text-muted">{m.sku}</span>
                 </div>
               );
             },
@@ -93,13 +93,13 @@ export function MovementsTable({
         return (
           <div className="min-w-0">
             {href ? (
-              <Link href={href} className="font-mono text-small font-medium text-brand hover:underline">
+              <Link href={href} className="font-mono text-label font-medium text-brand hover:underline">
                 {m.reference}
               </Link>
             ) : (
-              <span className="font-mono text-small text-ink-2">{m.reference}</span>
+              <span className="font-mono text-label text-ink-2">{m.reference}</span>
             )}
-            <div className="max-w-[220px] truncate text-caption text-muted" title={m.note}>
+            <div className="max-w-[220px] truncate text-label text-muted" title={m.note}>
               {whName(m.warehouseId)}
               {m.note ? ` · ${m.note}` : ""}
             </div>

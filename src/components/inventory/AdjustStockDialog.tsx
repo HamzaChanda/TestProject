@@ -96,7 +96,7 @@ export function AdjustStockDialog({ open, onClose, productId }: { open: boolean;
                   type="button"
                   onClick={() => setValue("direction", d)}
                   className={cn(
-                    "inline-flex h-[30px] items-center justify-center gap-1 rounded-control text-small font-medium capitalize transition",
+                    "inline-flex h-[30px] items-center justify-center gap-1 rounded-control text-label font-medium capitalize transition",
                     direction === d ? "bg-surface text-ink shadow-[0_1px_2px_rgba(16,24,40,0.08)]" : "text-muted hover:text-ink",
                   )}
                 >
@@ -123,7 +123,7 @@ export function AdjustStockDialog({ open, onClose, productId }: { open: boolean;
         </div>
 
         {product && (
-          <div className={cn("flex items-center justify-between rounded-panel border px-3.5 py-3 text-body", next < 0 ? "border-danger-line bg-danger-bg" : "border-line bg-subtle")}>
+          <div className={cn("flex items-center justify-between rounded-panel border px-3.5 py-3 text-body-sm", next < 0 ? "border-danger-line bg-danger-bg" : "border-line bg-subtle")}>
             <span className="text-muted">Stock in {state.warehouses.find((w) => w.id === wid)?.name}</span>
             <span className="flex items-center gap-2 font-medium tabular">
               <span className="text-ink-2">{current}</span>

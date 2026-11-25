@@ -2,8 +2,17 @@ import { forwardRef, type InputHTMLAttributes, type ReactNode, type SelectHTMLAt
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const control =
-  "w-full rounded-control border border-line-strong bg-surface px-3 text-ui text-ink placeholder:text-faint shadow-[0_1px_2px_rgba(16,24,40,0.03)] transition-[border,box-shadow] duration-150 hover:border-line-hover focus:border-brand focus:outline-none focus:ring-[3px] focus:ring-brand/15 disabled:cursor-not-allowed disabled:bg-subtle disabled:text-muted aria-[invalid=true]:border-danger aria-[invalid=true]:focus:ring-danger/15";
+/**
+ * Shared control surface (inputs, textareas, combobox & date triggers).
+ * Border uses the `control` token (3.16:1, WCAG 1.4.11). Forms are 36px, toolbars 32px.
+ */
+export const controlClass =
+  "w-full rounded-control border border-control bg-surface px-2.5 text-body text-ink placeholder:text-faint " +
+  "transition-[border-color,box-shadow] duration-[80ms] hover:border-ink-2 focus:border-petrol-500 focus:outline-none " +
+  "focus:ring-[3px] focus:ring-petrol-500/20 disabled:cursor-not-allowed disabled:border-line-strong disabled:bg-subtle disabled:text-muted " +
+  "aria-[invalid=true]:border-danger-solid aria-[invalid=true]:focus:ring-danger-solid/20 " +
+  "data-[invalid=true]:border-danger-solid data-[invalid=true]:focus:ring-danger-solid/20";
+const control = controlClass;
 
 export function Field({
   label,
@@ -28,7 +37,7 @@ export function Field({
     <div className={cn("flex min-w-0 flex-col gap-1.5", className)}>
       {label && (
         <div className="flex items-center justify-between gap-2">
-          <label htmlFor={htmlFor} className="text-small font-medium text-ink-2">
+          <label htmlFor={htmlFor} className="text-label font-medium text-ink-2">
             {label}
             {required && <span className="ml-0.5 text-danger">*</span>}
           </label>
@@ -37,11 +46,11 @@ export function Field({
       )}
       {children}
       {error ? (
-        <p className="text-small text-danger" role="alert">
+        <p className="text-label text-danger" role="alert">
           {error}
         </p>
       ) : hint ? (
-        <p className="text-small text-muted">{hint}</p>
+        <p className="text-label text-muted">{hint}</p>
       ) : null}
     </div>
   );
@@ -51,10 +60,12 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   invalid?: boolean;
   leading?: ReactNode;
   trailing?: ReactNode;
+  /** 32px (table/toolbar rows) instead of the 36px form height. */
+  compact?: boolean;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
-  { className, invalid, leading, trailing, onWheel, ...props },
+  { className, invalid, leading, trailing, compact, onWheel, ...props },
   ref,
 ) {
   // Scrolling the page over a focused number field must not change its value.
@@ -66,22 +77,22 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     return (
       <div className="relative">
         {leading && (
-          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-body text-muted">
+          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-body-sm text-muted">
             {leading}
           </span>
         )}
         <input
           ref={ref}
           aria-invalid={invalid || undefined}
-          className={cn(control, "h-9", leading && (String(leading).length > 1 ? "pl-12" : "pl-8"), trailing && "pr-10", className)}
+          className={cn(control, compact ? "h-8" : "h-9", leading && (String(leading).length > 1 ? "pl-12" : "pl-8"), trailing && "pr-10", className)}
           onWheel={wheel}
           {...props}
         />
-        {trailing && <span className="absolute inset-y-0 right-3 flex items-center text-small text-muted">{trailing}</span>}
+        {trailing && <span className="absolute inset-y-0 right-3 flex items-center text-label text-muted">{trailing}</span>}
       </div>
     );
   }
-  return <input ref={ref} aria-invalid={invalid || undefined} className={cn(control, "h-9", className)} onWheel={wheel} {...props} />;
+  return <input ref={ref} aria-invalid={invalid || undefined} className={cn(control, compact ? "h-8" : "h-9", className)} onWheel={wheel} {...props} />;
 });
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement> & { invalid?: boolean }>(
