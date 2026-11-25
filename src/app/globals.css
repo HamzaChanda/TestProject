@@ -1,26 +1,175 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-canvas: #f7f8fa;
+  --color-surface: #ffffff;
+  --color-subtle: #fafbfc;
+  --color-ink: #17191f;
+  --color-ink-2: #3b3f4a;
+  --color-muted: #747986;
+  --color-faint: #a2a6b1;
+  --color-line: #e9ebf0;
+  --color-line-strong: #dcdfe6;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --color-brand: #635bff;
+  --color-brand-hover: #5148e5;
+  --color-brand-50: #f3f2ff;
+  --color-brand-100: #e6e4ff;
+  --color-brand-700: #4338ca;
+
+  --color-success: #15803d;
+  --color-success-bg: #ecfdf3;
+  --color-success-line: #c6f0d6;
+  --color-warning: #b45309;
+  --color-warning-bg: #fff8eb;
+  --color-warning-line: #fbe3b4;
+  --color-danger: #d92d20;
+  --color-danger-bg: #fef3f2;
+  --color-danger-line: #fcd4d0;
+  --color-info: #1d6fd8;
+  --color-info-bg: #eff6ff;
+  --color-info-line: #cfe2fc;
+
+  --radius-card: 12px;
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 1px rgba(16, 24, 40, 0.02);
+  --shadow-pop: 0 12px 32px -8px rgba(16, 24, 40, 0.16), 0 4px 8px -4px rgba(16, 24, 40, 0.06);
+  --shadow-drawer: -16px 0 48px -12px rgba(16, 24, 40, 0.18);
+
+  /* Opaque row tints, so sticky table cells can inherit them. */
+  --color-row-danger: #fef8f7;
+  --color-row-warning: #fffbf2;
+  --color-row-hover: #fafbfd;
+
+  /* Motion system: short, ease-out, no bounce. Enter ≈ 160–220ms, exit ≈ 120–160ms. */
+  --ease-out-soft: cubic-bezier(0.22, 0.8, 0.36, 1);
+  --animate-fade-in: fade-in 160ms ease-out;
+  --animate-fade-out: fade-out 140ms ease-in forwards;
+  --animate-pop-in: pop-in 160ms var(--ease-out-soft);
+  --animate-pop-out: pop-out 120ms ease-in forwards;
+  --animate-slide-in: slide-in 220ms var(--ease-out-soft);
+  --animate-slide-out: slide-out 160ms ease-in forwards;
+  --animate-slide-in-left: slide-in-left 220ms var(--ease-out-soft);
+  --animate-slide-out-left: slide-out-left 160ms ease-in forwards;
+  --animate-page-in: page-in 200ms var(--ease-out-soft) backwards;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  @keyframes pop-in {
+    from { opacity: 0; transform: translateY(4px) scale(0.985); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes pop-out {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to { opacity: 0; transform: translateY(2px) scale(0.985); }
+  }
+  @keyframes page-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes slide-out {
+    from { transform: translateX(0); }
+    to { transform: translateX(100%); }
+  }
+  @keyframes slide-out-left {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+  }
+  @keyframes progress-indeterminate {
+    0% { transform: translateX(-100%) scaleX(0.4); }
+    50% { transform: translateX(10%) scaleX(0.6); }
+    100% { transform: translateX(100%) scaleX(0.4); }
+  }
+  @keyframes slide-in {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+  @keyframes slide-in-left {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  html {
+    /* Reserve the scrollbar's space so pages never shift sideways between short and long pages. */
+    scrollbar-gutter: stable;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv11", "ss01";
+    overflow-x: hidden;
+  }
+  ::selection {
+    background: var(--color-brand-100);
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line-strong) transparent;
+}
+
+/* Print: only the printable document is shown. */
+@media print {
+  @page {
+    margin: 14mm;
+  }
+  body {
+    background: #fff !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-area {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .print-shell {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}
+
+/* Respect users who ask for less motion: keep state changes, drop movement. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
 }
