@@ -3,7 +3,8 @@ import { Inter } from "next/font/google";
 import { AppShell } from "@/components/layout/AppShell";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+// The optical-size axis gives large headings display-tuned letterforms automatically.
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap", axes: ["opsz"] });
 
 export const metadata: Metadata = {
   title: { default: "StockFlow — Inventory & Operations", template: "%s · StockFlow" },

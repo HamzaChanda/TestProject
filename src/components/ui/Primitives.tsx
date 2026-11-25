@@ -35,7 +35,7 @@ export function PageHeader({
         {back && (
           <Link
             href={back.href}
-            className="no-print group mb-2 inline-flex items-center gap-1 text-[12.5px] font-medium text-muted transition-colors hover:text-ink"
+            className="no-print group mb-2 inline-flex items-center gap-1 text-small font-medium text-muted transition-colors hover:text-ink"
           >
             <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" />
             {back.label}
@@ -43,7 +43,7 @@ export function PageHeader({
         )}
         {meta && <div className="mb-2 flex flex-wrap items-center gap-2">{meta}</div>}
         <h1 className="truncate text-[22px] leading-tight font-semibold tracking-[-0.02em] text-ink md:text-[24px]">{title}</h1>
-        {description && <p className="mt-1.5 text-[13.5px] leading-relaxed text-muted">{description}</p>}
+        {description && <p className="mt-1.5 text-ui leading-relaxed text-muted">{description}</p>}
       </div>
       {actions && <div className="no-print flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
     </div>
@@ -80,7 +80,7 @@ export function StatCard({
     warning: "bg-warning-bg text-warning",
     danger: "bg-danger-bg text-danger",
     info: "bg-info-bg text-info",
-    neutral: "bg-[#f2f3f6] text-ink-2",
+    neutral: "bg-fill text-ink-2",
   };
   const showTrend = trend !== undefined;
   const positive = trend !== null && trend !== undefined && (invertTrend ? trend < 0 : trend > 0);
@@ -90,18 +90,18 @@ export function StatCard({
     <Card className={cn("relative overflow-hidden", onClick && "transition-shadow hover:shadow-[0_4px_14px_-6px_rgba(16,24,40,0.12)]")}>
       <Comp onClick={onClick} className="block w-full p-4 text-left md:p-5">
         <div className="flex items-center justify-between gap-3">
-          <span className="text-[12.5px] font-medium text-muted">{label}</span>
-          {icon && <span className={cn("grid h-8 w-8 place-items-center rounded-[9px] [&_svg]:h-4 [&_svg]:w-4", accents[accent])}>{icon}</span>}
+          <span className="text-small font-medium text-muted">{label}</span>
+          {icon && <span className={cn("grid h-8 w-8 place-items-center rounded-control [&_svg]:h-4 [&_svg]:w-4", accents[accent])}>{icon}</span>}
         </div>
         <div className="mt-2.5 text-[24px] leading-none font-semibold tracking-[-0.02em] text-ink tabular md:text-[26px]">{value}</div>
-        <div className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px]">
+        <div className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-small">
           {showTrend && (
             <span
               className={cn(
                 "inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 font-medium tabular",
                 positive && "bg-success-bg text-success",
                 negative && "bg-danger-bg text-danger",
-                !positive && !negative && "bg-[#f2f3f6] text-muted",
+                !positive && !negative && "bg-fill text-muted",
               )}
             >
               {trend === null ? (
@@ -120,7 +120,7 @@ export function StatCard({
           )}
           {(hint || trendLabel) && <span className="text-muted">{trendLabel ?? hint}</span>}
         </div>
-        {trendLabel && hint && <div className="mt-1 text-[12px] text-faint">{hint}</div>}
+        {trendLabel && hint && <div className="mt-1 text-small text-faint">{hint}</div>}
       </Comp>
     </Card>
   );
@@ -149,8 +149,8 @@ export function EmptyState({
           {icon}
         </div>
       </div>
-      <h3 className="text-[14.5px] font-semibold text-ink">{title}</h3>
-      {description && <p className="mt-1 max-w-sm text-[13px] text-muted">{description}</p>}
+      <h3 className="text-title-sm font-semibold text-ink">{title}</h3>
+      {description && <p className="mt-1 max-w-sm text-body text-muted">{description}</p>}
       {action && <div className="mt-4 flex flex-wrap justify-center gap-2">{action}</div>}
     </div>
   );
@@ -176,7 +176,7 @@ export function SearchInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="h-9 w-full rounded-[9px] border border-line-strong bg-surface pr-8 pl-9 text-[13px] text-ink placeholder:text-faint shadow-[0_1px_2px_rgba(16,24,40,0.03)] transition focus:border-brand focus:ring-[3px] focus:ring-brand/15 focus:outline-none"
+        className="h-9 w-full rounded-control border border-line-strong bg-surface pr-8 pl-9 text-body text-ink placeholder:text-faint shadow-[0_1px_2px_rgba(16,24,40,0.03)] transition focus:border-brand focus:ring-[3px] focus:ring-brand/15 focus:outline-none"
       />
       {value && (
         <button
@@ -213,7 +213,7 @@ export function FilterSelect({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={cn(
-          "h-9 w-full cursor-pointer appearance-none rounded-[9px] border border-line-strong bg-surface pr-8 pl-3 text-[13px] text-ink-2 shadow-[0_1px_2px_rgba(16,24,40,0.03)] transition hover:border-[#cbd0d9] focus:border-brand focus:ring-[3px] focus:ring-brand/15 focus:outline-none",
+          "h-9 w-full cursor-pointer appearance-none rounded-control border border-line-strong bg-surface pr-8 pl-3 text-body text-ink-2 shadow-[0_1px_2px_rgba(16,24,40,0.03)] transition hover:border-line-hover focus:border-brand focus:ring-[3px] focus:ring-brand/15 focus:outline-none",
           value !== "all" && "border-brand/40 bg-brand-50/40 text-ink",
         )}
       >
@@ -250,7 +250,7 @@ export function Segmented<T extends string>({
   size?: "sm" | "md";
 }) {
   return (
-    <div className={cn("scrollbar-thin inline-flex max-w-full overflow-x-auto rounded-[10px] bg-[#eef0f3] p-[3px]", className)} role="tablist">
+    <div className={cn("scrollbar-thin inline-flex max-w-full overflow-x-auto rounded-panel bg-pressed p-[3px]", className)} role="tablist">
       {options.map((o) => (
         <button
           key={o.value}
@@ -258,14 +258,14 @@ export function Segmented<T extends string>({
           aria-selected={value === o.value}
           onClick={() => onChange(o.value)}
           className={cn(
-            "inline-flex shrink-0 items-center gap-1.5 rounded-[8px] font-medium whitespace-nowrap transition-all",
-            size === "sm" ? "h-7 px-2.5 text-[12px]" : "h-8 px-3 text-[12.5px]",
+            "inline-flex shrink-0 items-center gap-1.5 rounded-control font-medium whitespace-nowrap transition-all",
+            size === "sm" ? "h-7 px-2.5 text-small" : "h-8 px-3 text-small",
             value === o.value ? "bg-surface text-ink shadow-[0_1px_2px_rgba(16,24,40,0.08)]" : "text-muted hover:text-ink",
           )}
         >
           {o.label}
           {o.count !== undefined && (
-            <span className={cn("rounded px-1 text-[11px] tabular", value === o.value ? "bg-brand-50 text-brand" : "bg-black/5 text-muted")}>{o.count}</span>
+            <span className={cn("rounded px-1 text-micro tabular", value === o.value ? "bg-brand-50 text-brand" : "bg-black/5 text-muted")}>{o.count}</span>
           )}
         </button>
       ))}
@@ -282,7 +282,7 @@ export function Tooltip({ label, children, side = "top" }: { label: string; chil
       <span
         role="tooltip"
         className={cn(
-          "pointer-events-none absolute z-[90] rounded-md bg-ink px-2 py-1 text-[11.5px] font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity delay-75 duration-150 group-hover/tt:opacity-100 group-focus-within/tt:opacity-100",
+          "pointer-events-none absolute z-[90] rounded-md bg-ink px-2 py-1 text-caption font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity delay-75 duration-150 group-hover/tt:opacity-100 group-focus-within/tt:opacity-100",
           side === "top" && "bottom-[calc(100%+6px)] left-1/2 -translate-x-1/2",
           side === "bottom" && "top-[calc(100%+6px)] left-1/2 -translate-x-1/2",
           side === "right" && "top-1/2 left-[calc(100%+10px)] -translate-y-1/2",
@@ -328,7 +328,7 @@ export function ProductThumb({ name, category, size = 34 }: { name: string; cate
     .join("");
   return (
     <span
-      className={cn("inline-grid shrink-0 place-items-center rounded-[9px] text-[11.5px] font-semibold ring-1 ring-black/[0.04] ring-inset", tones[category] ?? "bg-[#f2f3f6] text-ink-2")}
+      className={cn("inline-grid shrink-0 place-items-center rounded-control text-caption font-semibold ring-1 ring-black/[0.04] ring-inset", tones[category] ?? "bg-fill text-ink-2")}
       style={{ width: size, height: size }}
     >
       {letters}
@@ -339,22 +339,22 @@ export function ProductThumb({ name, category, size = 34 }: { name: string; cate
 export function KeyValue({ label, children, className }: { label: string; children: ReactNode; className?: string }) {
   return (
     <div className={cn("min-w-0", className)}>
-      <dt className="text-[12px] text-muted">{label}</dt>
-      <dd className="mt-0.5 text-[13.5px] font-medium text-ink">{children}</dd>
+      <dt className="text-small text-muted">{label}</dt>
+      <dd className="mt-0.5 text-ui font-medium text-ink">{children}</dd>
     </div>
   );
 }
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div className={cn("animate-pulse rounded-md bg-[#eceef2]", className)} />;
+  return <div className={cn("animate-pulse rounded-md bg-pressed", className)} />;
 }
 
 export function StockBar({ qty, min }: { qty: number; min: number }) {
   const cap = Math.max(min * 3, qty, 1);
   const pct = Math.min(100, (qty / cap) * 100);
-  const tone = qty <= 0 ? "bg-danger" : qty <= min ? "bg-[#f59e0b]" : "bg-[#22a157]";
+  const tone = qty <= 0 ? "bg-danger" : qty <= min ? "bg-warning-solid" : "bg-success-solid";
   return (
-    <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#eef0f3]">
+    <div className="h-1.5 w-full overflow-hidden rounded-full bg-pressed">
       <div className={cn("h-full rounded-full transition-all", tone)} style={{ width: `${Math.max(pct, qty > 0 ? 4 : 0)}%` }} />
     </div>
   );

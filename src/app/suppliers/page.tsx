@@ -56,12 +56,12 @@ function SuppliersInner() {
       sortValue: (s) => s.name,
       cell: (s) => (
         <Link href={`/suppliers/${s.id}`} className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
-          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[9px] bg-[#fff1ea] text-[#c2410c]">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-control bg-[#fff1ea] text-[#c2410c]">
             <Building2 className="h-4 w-4" />
           </span>
           <span className="min-w-0">
             <span className="block max-w-[220px] truncate font-medium text-ink hover:text-brand">{s.name}</span>
-            <span className="block text-[12px] text-muted">
+            <span className="block text-small text-muted">
               {s.city} · {s.paymentTerms}
             </span>
           </span>

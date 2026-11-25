@@ -60,7 +60,7 @@ export function RecordPaymentDialog({ open, onClose, sale }: { open: boolean; on
         </>
       }
     >
-      <dl className="mb-4 grid grid-cols-3 gap-3 rounded-[10px] bg-subtle p-3 text-[12px]">
+      <dl className="mb-4 grid grid-cols-3 gap-3 rounded-panel bg-subtle p-3 text-small">
         <div>
           <dt className="text-muted">Invoice total</dt>
           <dd className="mt-0.5 font-medium text-ink tabular">{formatCurrency(sale.total)}</dd>

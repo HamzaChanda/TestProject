@@ -53,12 +53,12 @@ export default function ProductsPage() {
           <ProductThumb name={p.name} category={p.category} />
           <span className="min-w-0">
             <span className="block max-w-[240px] truncate font-medium text-ink hover:text-brand">{p.name}</span>
-            <span className="block max-w-[240px] truncate text-[12px] text-muted">{supplierName(p.supplierId)}</span>
+            <span className="block max-w-[240px] truncate text-small text-muted">{supplierName(p.supplierId)}</span>
           </span>
         </Link>
       ),
     },
-    { key: "sku", header: "SKU", sortValue: (p) => p.sku, cell: (p) => <span className="font-mono text-[12px] text-ink-2">{p.sku}</span> },
+    { key: "sku", header: "SKU", sortValue: (p) => p.sku, cell: (p) => <span className="font-mono text-small text-ink-2">{p.sku}</span> },
     { key: "category", hideBelow: "laptop", header: "Category", sortValue: (p) => p.category, cell: (p) => p.category },
     { key: "unit", hideBelow: "desktop", header: "Unit", cell: (p) => <span className="text-muted">{p.unit}</span>, hideOnMobile: true },
     { key: "sell", header: "Selling price", align: "right", sortValue: (p) => p.sellingPrice, cell: (p) => <span className="font-medium text-ink tabular">{formatCurrency(p.sellingPrice)}</span> },
@@ -70,7 +70,7 @@ export default function ProductsPage() {
       sortValue: (p) => totalStock(p),
       cell: (p) => (
         <span className="tabular">
-          <span className="font-semibold text-ink">{totalStock(p)}</span> <span className="text-[12px] text-muted">{p.unit}</span>
+          <span className="font-semibold text-ink">{totalStock(p)}</span> <span className="text-small text-muted">{p.unit}</span>
         </span>
       ),
     },
@@ -167,7 +167,7 @@ export default function ProductsPage() {
               Clear filters
             </Button>
           )}
-          <span className="text-[12.5px] text-muted sm:ml-auto">
+          <span className="text-small text-muted sm:ml-auto">
             {filtered.length} of {state.products.length}
           </span>
         </Toolbar>

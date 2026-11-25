@@ -27,15 +27,15 @@ export function FormSection({
         <div className="flex items-start gap-3">
           <span
             className={cn(
-              "grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11.5px] font-semibold transition-colors",
+              "grid h-6 w-6 shrink-0 place-items-center rounded-full text-caption font-semibold transition-colors",
               complete ? "bg-success text-white" : "bg-brand-50 text-brand ring-1 ring-brand-100 ring-inset",
             )}
           >
             {complete ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : step}
           </span>
           <div>
-            <h3 className="text-[14.5px] font-semibold tracking-[-0.01em] text-ink">{title}</h3>
-            {description && <p className="mt-0.5 text-[12.5px] text-muted">{description}</p>}
+            <h3 className="text-title-sm font-semibold tracking-[-0.01em] text-ink">{title}</h3>
+            {description && <p className="mt-0.5 text-small text-muted">{description}</p>}
           </div>
         </div>
         {actions}

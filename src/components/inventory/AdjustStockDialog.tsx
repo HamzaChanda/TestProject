@@ -89,14 +89,14 @@ export function AdjustStockDialog({ open, onClose, productId }: { open: boolean;
             </Select>
           </Field>
           <Field label="Adjustment type" required>
-            <div className="grid grid-cols-2 gap-1 rounded-[10px] bg-[#eef0f3] p-[3px]">
+            <div className="grid grid-cols-2 gap-1 rounded-panel bg-pressed p-[3px]">
               {(["increase", "decrease"] as const).map((d) => (
                 <button
                   key={d}
                   type="button"
                   onClick={() => setValue("direction", d)}
                   className={cn(
-                    "inline-flex h-[30px] items-center justify-center gap-1 rounded-[8px] text-[12.5px] font-medium capitalize transition",
+                    "inline-flex h-[30px] items-center justify-center gap-1 rounded-control text-small font-medium capitalize transition",
                     direction === d ? "bg-surface text-ink shadow-[0_1px_2px_rgba(16,24,40,0.08)]" : "text-muted hover:text-ink",
                   )}
                 >
@@ -123,7 +123,7 @@ export function AdjustStockDialog({ open, onClose, productId }: { open: boolean;
         </div>
 
         {product && (
-          <div className={cn("flex items-center justify-between rounded-[10px] border px-3.5 py-3 text-[13px]", next < 0 ? "border-danger-line bg-danger-bg" : "border-line bg-subtle")}>
+          <div className={cn("flex items-center justify-between rounded-panel border px-3.5 py-3 text-body", next < 0 ? "border-danger-line bg-danger-bg" : "border-line bg-subtle")}>
             <span className="text-muted">Stock in {state.warehouses.find((w) => w.id === wid)?.name}</span>
             <span className="flex items-center gap-2 font-medium tabular">
               <span className="text-ink-2">{current}</span>

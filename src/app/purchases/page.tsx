@@ -56,7 +56,7 @@ export default function PurchasesPage() {
       header: "Purchase order",
       sortValue: (p) => p.poNumber,
       cell: (p) => (
-        <Link href={`/purchases/${p.id}`} onClick={(e) => e.stopPropagation()} className="font-mono text-[12.5px] font-medium text-ink hover:text-brand">
+        <Link href={`/purchases/${p.id}`} onClick={(e) => e.stopPropagation()} className="font-mono text-small font-medium text-ink hover:text-brand">
           {p.poNumber}
         </Link>
       ),
@@ -70,7 +70,7 @@ export default function PurchasesPage() {
       cell: (p) => (
         <div className="leading-tight">
           <div className={cn(isOverdue(p) && "font-medium text-danger")}>{formatDate(p.expectedDate)}</div>
-          {isOverdue(p) && <div className="mt-0.5 text-[11px] font-medium text-danger">Overdue</div>}
+          {isOverdue(p) && <div className="mt-0.5 text-micro font-medium text-danger">Overdue</div>}
         </div>
       ),
     },
@@ -82,14 +82,14 @@ export default function PurchasesPage() {
         const pr = purchaseProgress(p);
         return (
           <div className="w-[92px]">
-            <div className="mb-1 flex justify-between text-[11.5px] tabular">
+            <div className="mb-1 flex justify-between text-caption tabular">
               <span className="text-ink-2">
                 {pr.received}/{pr.ordered}
               </span>
               <span className="text-muted">{pr.pct}%</span>
             </div>
-            <div className="h-1.5 overflow-hidden rounded-full bg-[#eef0f3]">
-              <div className={cn("h-full rounded-full", pr.pct === 100 ? "bg-[#22a157]" : "bg-info")} style={{ width: `${pr.pct}%` }} />
+            <div className="h-1.5 overflow-hidden rounded-full bg-pressed">
+              <div className={cn("h-full rounded-full", pr.pct === 100 ? "bg-success-solid" : "bg-info")} style={{ width: `${pr.pct}%` }} />
             </div>
           </div>
         );

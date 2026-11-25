@@ -5,7 +5,7 @@ import Link from "next/link";
 import { differenceInCalendarDays, eachDayOfInterval, eachMonthOfInterval, eachWeekOfInterval, endOfDay, endOfWeek, format, parseISO, startOfDay, startOfWeek } from "date-fns";
 import { AlertTriangle, Boxes, CircleDollarSign, ClipboardList, Download, FileText, PackageCheck, Printer, ReceiptText, ShoppingCart, TrendingUp, Wallet } from "lucide-react";
 import { useInventory } from "@/context/InventoryContext";
-import { RANGE_PRESETS, getCategoryDistribution, getTopProducts, inRange, isActiveSale, isCommittedPurchase, rangeFromPreset, receivedValue, type DateRange, type RangePreset } from "@/lib/selectors";
+import { RANGE_PRESETS, getCategoryDistribution, getReplenishment, getTopProducts, inRange, isActiveSale, isCommittedPurchase, rangeFromPreset, receivedValue, type DateRange, type RangePreset } from "@/lib/selectors";
 import { productStatus, stockValue, totalStock } from "@/lib/calc";
 import { CHART_COLORS } from "@/lib/constants";
 import { formatCurrency, formatDate, formatNumber, round2 } from "@/lib/utils";
@@ -110,22 +110,49 @@ export default function ReportsPage() {
   /* ----- Columns ----- */
   const stockColumns: Column<Product>[] = [
     { key: "product", header: "Product", sortValue: (p) => p.name, cell: (p) => <Link href={`/products/${p.id}`} className="font-medium text-ink hover:text-brand">{p.name}</Link> },
-    { key: "sku", header: "SKU", sortValue: (p) => p.sku, cell: (p) => <span className="font-mono text-[12px]">{p.sku}</span> },
+    { key: "sku", header: "SKU", sortValue: (p) => p.sku, cell: (p) => <span className="font-mono text-small">{p.sku}</span> },
     { key: "category", header: "Category", sortValue: (p) => p.category, cell: (p) => p.category },
     { key: "qty", header: "Current qty", align: "right", sortValue: (p) => totalStock(p), cell: (p) => <span className="font-semibold text-ink tabular">{totalStock(p)}</span> },
     { key: "min", header: "Min qty", align: "right", sortValue: (p) => p.minStock, cell: (p) => <span className="tabular">{p.minStock}</span> },
     { key: "value", header: "Stock value", align: "right", sortValue: (p) => stockValue(p), cell: (p) => <span className="tabular">{formatCurrency(stockValue(p))}</span> },
+    {
+      key: "cover",
+      header: "Cover",
+      align: "right",
+      hideBelow: "desktop",
+      sortValue: (p) => getReplenishment(state, p).daysOfCover ?? 9999,
+      cell: (p) => {
+        const d = getReplenishment(state, p).daysOfCover;
+        return totalStock(p) <= 0 ? <span className="text-danger">0 days</span> : d === null ? <span className="text-faint">—</span> : <span className="tabular">{d} days</span>;
+      },
+    },
+    {
+      key: "reorder",
+      header: "Suggested order",
+      align: "right",
+      sortValue: (p) => getReplenishment(state, p).suggestedQty,
+      cell: (p) => {
+        const q = getReplenishment(state, p).suggestedQty;
+        return q > 0 ? (
+          <Link href={`/purchases/new?product=${p.id}&qty=${q}`} className="font-semibold text-brand tabular hover:underline">
+            {q}
+          </Link>
+        ) : (
+          <span className="text-faint">—</span>
+        );
+      },
+    },
     { key: "status", header: "Status", sortValue: (p) => productStatus(p), cell: (p) => <StatusBadge status={productStatus(p)} /> },
   ];
   const salesColumns: Column<Sale>[] = [
-    { key: "invoice", header: "Invoice", sortValue: (s) => s.invoiceNo, cell: (s) => <Link href={`/sales/${s.id}`} className="font-mono text-[12.5px] font-medium text-ink hover:text-brand">{s.invoiceNo}</Link> },
+    { key: "invoice", header: "Invoice", sortValue: (s) => s.invoiceNo, cell: (s) => <Link href={`/sales/${s.id}`} className="font-mono text-small font-medium text-ink hover:text-brand">{s.invoiceNo}</Link> },
     { key: "customer", header: "Customer", sortValue: (s) => s.customerName, cell: (s) => s.customerName },
     { key: "date", header: "Date", sortValue: (s) => s.date, cell: (s) => formatDate(s.date) },
     { key: "revenue", header: "Revenue", align: "right", sortValue: (s) => (s.status === "Cancelled" ? 0 : s.total), cell: (s) => <span className={s.status === "Cancelled" ? "text-faint line-through tabular" : "font-semibold text-ink tabular"}>{formatCurrency(s.total)}</span> },
     { key: "payment", header: "Payment", sortValue: (s) => s.paymentStatus, cell: (s) => (s.status === "Cancelled" ? <StatusBadge status="Cancelled" /> : <StatusBadge status={s.paymentStatus} />) },
   ];
   const purchaseColumns: Column<Purchase>[] = [
-    { key: "po", header: "Purchase order", sortValue: (p) => p.poNumber, cell: (p) => <Link href={`/purchases/${p.id}`} className="font-mono text-[12.5px] font-medium text-ink hover:text-brand">{p.poNumber}</Link> },
+    { key: "po", header: "Purchase order", sortValue: (p) => p.poNumber, cell: (p) => <Link href={`/purchases/${p.id}`} className="font-mono text-small font-medium text-ink hover:text-brand">{p.poNumber}</Link> },
     { key: "supplier", header: "Supplier", sortValue: (p) => p.supplierName, cell: (p) => p.supplierName },
     { key: "date", header: "Date", sortValue: (p) => p.orderDate, cell: (p) => formatDate(p.orderDate) },
     { key: "total", header: "Total amount", align: "right", sortValue: (p) => p.total, cell: (p) => <span className="font-semibold text-ink tabular">{formatCurrency(p.total)}</span> },
@@ -136,7 +163,7 @@ export default function ReportsPage() {
   const exportCsv = () => {
     const stamp = formatDate(new Date(), "yyyy-MM-dd");
     if (tab === "stock")
-      downloadCsv(`stock-report-${stamp}`, stockRows.map((p) => ({ Product: p.name, SKU: p.sku, Category: p.category, "Current Quantity": totalStock(p), "Minimum Quantity": p.minStock, "Stock Value": stockValue(p), "Stock Status": productStatus(p) })));
+      downloadCsv(`stock-report-${stamp}`, stockRows.map((p) => ({ Product: p.name, SKU: p.sku, Category: p.category, "Current Quantity": totalStock(p), "Minimum Quantity": p.minStock, "Stock Value": stockValue(p), "Stock Status": productStatus(p), "Days of Cover": getReplenishment(state, p).daysOfCover ?? "", "Suggested Order": getReplenishment(state, p).suggestedQty })));
     else if (tab === "sales")
       downloadCsv(`sales-report-${stamp}`, salesInRange.map((s) => ({ "Invoice Number": s.invoiceNo, Customer: s.customerName, Date: formatDate(s.date, "yyyy-MM-dd"), Revenue: s.status === "Cancelled" ? 0 : s.total, "Payment Status": s.status === "Cancelled" ? "Cancelled" : s.paymentStatus })));
     else
@@ -178,9 +205,9 @@ export default function ReportsPage() {
               <FilterSelect label="Date range" value={period} onChange={(v) => setPeriod(v as Period)} options={[...RANGE_PRESETS, { value: "custom", label: "Custom range…" }]} className="min-w-[150px]" />
               {period === "custom" && (
                 <div className="flex items-center gap-2">
-                  <input type="date" value={from} max={to} onChange={(e) => e.target.value && setFrom(e.target.value)} className="h-9 rounded-[9px] border border-line-strong bg-surface px-2.5 text-[13px] focus:border-brand focus:outline-none" aria-label="From date" />
+                  <input type="date" value={from} max={to} onChange={(e) => e.target.value && setFrom(e.target.value)} className="h-9 rounded-control border border-line-strong bg-surface px-2.5 text-body focus:border-brand focus:outline-none" aria-label="From date" />
                   <span className="text-muted">–</span>
-                  <input type="date" value={to} min={from} onChange={(e) => e.target.value && setTo(e.target.value)} className="h-9 rounded-[9px] border border-line-strong bg-surface px-2.5 text-[13px] focus:border-brand focus:outline-none" aria-label="To date" />
+                  <input type="date" value={to} min={from} onChange={(e) => e.target.value && setTo(e.target.value)} className="h-9 rounded-control border border-line-strong bg-surface px-2.5 text-body focus:border-brand focus:outline-none" aria-label="To date" />
                 </div>
               )}
             </>

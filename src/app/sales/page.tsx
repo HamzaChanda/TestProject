@@ -63,7 +63,7 @@ export default function SalesPage() {
       header: "Invoice",
       sortValue: (s) => s.invoiceNo,
       cell: (s) => (
-        <Link href={`/sales/${s.id}`} onClick={(e) => e.stopPropagation()} className="font-mono text-[12.5px] font-medium text-ink hover:text-brand">
+        <Link href={`/sales/${s.id}`} onClick={(e) => e.stopPropagation()} className="font-mono text-small font-medium text-ink hover:text-brand">
           {s.invoiceNo}
         </Link>
       ),
@@ -77,7 +77,7 @@ export default function SalesPage() {
         return (
           <div className="min-w-0">
             <div className="max-w-[200px] truncate font-medium text-ink">{s.customerName}</div>
-            {c?.company && <div className="max-w-[200px] truncate text-[12px] text-muted">{c.company}</div>}
+            {c?.company && <div className="max-w-[200px] truncate text-small text-muted">{c.company}</div>}
           </div>
         );
       },
@@ -90,7 +90,7 @@ export default function SalesPage() {
       sortValue: (s) => s.items.reduce((n, i) => n + i.quantity, 0),
       cell: (s) => (
         <span className="tabular" title={s.items.map((i) => `${i.quantity} × ${i.name}`).join("\n")}>
-          {s.items.reduce((n, i) => n + i.quantity, 0)} <span className="text-[12px] text-muted">({s.items.length})</span>
+          {s.items.reduce((n, i) => n + i.quantity, 0)} <span className="text-small text-muted">({s.items.length})</span>
         </span>
       ),
     },
@@ -212,9 +212,9 @@ export default function SalesPage() {
           </div>
           {period === "custom" && (
             <div className="flex items-center gap-2">
-              <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="h-9 rounded-[9px] border border-line-strong px-2.5 text-[13px] focus:border-brand focus:outline-none" aria-label="From date" />
+              <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="h-9 rounded-control border border-line-strong px-2.5 text-body focus:border-brand focus:outline-none" aria-label="From date" />
               <span className="text-muted">–</span>
-              <input type="date" value={to} min={from} onChange={(e) => setTo(e.target.value)} className="h-9 rounded-[9px] border border-line-strong px-2.5 text-[13px] focus:border-brand focus:outline-none" aria-label="To date" />
+              <input type="date" value={to} min={from} onChange={(e) => setTo(e.target.value)} className="h-9 rounded-control border border-line-strong px-2.5 text-body focus:border-brand focus:outline-none" aria-label="To date" />
             </div>
           )}
           {filtersActive && (

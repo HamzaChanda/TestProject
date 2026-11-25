@@ -123,7 +123,7 @@ export function TransferDialog({ open, onClose, productId }: { open: boolean; on
         </Field>
 
         {product && from !== to && (
-          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-[10px] border border-line bg-subtle p-3 text-center text-[12.5px]">
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-panel border border-line bg-subtle p-3 text-center text-small">
             <div>
               <div className="text-muted">{nameOf(from)}</div>
               <div className="mt-0.5 font-medium text-ink tabular">
@@ -151,14 +151,14 @@ export function TransferDialog({ open, onClose, productId }: { open: boolean; on
                 key={String(o.v)}
                 onClick={() => setValue("completeNow", o.v)}
                 className={cn(
-                  "flex items-start gap-2.5 rounded-[10px] border p-3 text-left transition",
+                  "flex items-start gap-2.5 rounded-panel border p-3 text-left transition",
                   completeNow === o.v ? "border-brand bg-brand-50/50 ring-[3px] ring-brand/10" : "border-line hover:border-line-strong",
                 )}
               >
                 <o.icon className={cn("mt-0.5 h-4 w-4", completeNow === o.v ? "text-brand" : "text-muted")} />
                 <span>
-                  <span className="block text-[13px] font-medium text-ink">{o.title}</span>
-                  <span className="block text-[12px] text-muted">{o.body}</span>
+                  <span className="block text-body font-medium text-ink">{o.title}</span>
+                  <span className="block text-small text-muted">{o.body}</span>
                 </span>
               </button>
             ))}

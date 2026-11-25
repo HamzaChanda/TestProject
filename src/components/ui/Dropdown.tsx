@@ -113,7 +113,7 @@ export function Dropdown({
               maxHeight: pos?.maxHeight,
             }}
             className={cn(
-              "scrollbar-thin fixed z-[80] overflow-y-auto rounded-[12px] border border-line bg-surface p-1 shadow-[var(--shadow-pop)]",
+              "scrollbar-thin fixed z-[80] overflow-y-auto rounded-card border border-line bg-surface p-1 shadow-[var(--shadow-pop)]",
               closing ? "pointer-events-none animate-pop-out" : "animate-pop-in",
               className,
             )}
@@ -125,11 +125,11 @@ export function Dropdown({
                     <>
                       {item.icon && <span className={cn("text-muted", item.danger && "text-danger")}>{item.icon}</span>}
                       <span className="flex-1 truncate">{item.label}</span>
-                      {item.hint && <span className="text-[11px] text-faint">{item.hint}</span>}
+                      {item.hint && <span className="text-micro text-faint">{item.hint}</span>}
                     </>
                   );
                   const cls = cn(
-                    "flex w-full items-center gap-2.5 rounded-[8px] px-2.5 py-[7px] text-left text-[13px] text-ink-2 transition-colors hover:bg-[#f3f4f7] hover:text-ink [&_svg]:h-[15px] [&_svg]:w-[15px]",
+                    "flex w-full items-center gap-2.5 rounded-control px-2.5 py-[7px] text-left text-body text-ink-2 transition-colors hover:bg-hover hover:text-ink [&_svg]:h-[15px] [&_svg]:w-[15px]",
                     item.danger && "text-danger hover:bg-danger-bg hover:text-danger",
                     item.disabled && "pointer-events-none opacity-45",
                   );

@@ -118,7 +118,7 @@ export function ProductForm({ product }: { product?: Product }) {
                   <button
                     type="button"
                     onClick={() => setValue("sku", suggestSku(name, category), { shouldValidate: true })}
-                    className="inline-flex items-center gap-1 text-[12px] font-medium text-brand hover:underline"
+                    className="inline-flex items-center gap-1 text-small font-medium text-brand hover:underline"
                   >
                     <Wand2 className="h-3 w-3" /> Generate
                   </button>
@@ -151,7 +151,7 @@ export function ProductForm({ product }: { product?: Product }) {
               <Input type="number" step="0.01" min={0} leading={sym} placeholder="0.00" {...register("costPrice", { valueAsNumber: true })} invalid={!!errors.costPrice} />
             </Field>
             <Field label="Gross margin" hint={margin !== null && margin < 0 ? "Selling below cost — allowed, but check this is intended" : undefined}>
-              <div className="flex h-9 items-center rounded-[9px] border border-dashed border-line-strong bg-subtle px-3 text-[13.5px] font-medium tabular">
+              <div className="flex h-9 items-center rounded-control border border-dashed border-line-strong bg-subtle px-3 text-ui font-medium tabular">
                 {margin === null ? (
                   <span className="text-faint">—</span>
                 ) : (
@@ -209,7 +209,7 @@ export function ProductForm({ product }: { product?: Product }) {
           </CardBody>
         </Card>
         {editing && (
-          <div className="flex gap-2.5 rounded-[12px] border border-info-line bg-info-bg p-3.5 text-[12.5px] text-info">
+          <div className="flex gap-2.5 rounded-card border border-info-line bg-info-bg p-3.5 text-small text-info">
             <Info className="mt-0.5 h-4 w-4 shrink-0" />
             Stock quantities are changed only through transactions (sales, purchases, adjustments, transfers) so history stays accurate.
           </div>

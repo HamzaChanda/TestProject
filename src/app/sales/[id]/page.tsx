@@ -80,7 +80,7 @@ function InvoiceInner() {
       />
 
       {cancelled && (
-        <div className="no-print mb-5 rounded-[12px] border border-line bg-surface px-4 py-3 text-[13px] text-ink-2">
+        <div className="no-print mb-5 rounded-card border border-line bg-surface px-4 py-3 text-body text-ink-2">
           <span className="font-medium text-ink">Cancelled {formatDateTime(sale.cancelledAt)}</span>
           {sale.cancelReason ? ` — ${sale.cancelReason}` : ""}. Stock for all items was returned to {warehouse?.name}.
         </div>
@@ -100,11 +100,11 @@ function InvoiceInner() {
               <div className="flex items-center gap-2.5">
                 <Logo size={34} />
                 <div>
-                  <div className="text-[17px] font-semibold tracking-[-0.01em] text-ink">{biz.businessName}</div>
-                  <div className="text-[12px] text-muted">{biz.legalName}</div>
+                  <div className="text-title font-semibold tracking-[-0.01em] text-ink">{biz.businessName}</div>
+                  <div className="text-small text-muted">{biz.legalName}</div>
                 </div>
               </div>
-              <div className="mt-3 max-w-[280px] text-[12px] leading-relaxed text-muted">
+              <div className="mt-3 max-w-[280px] text-small leading-relaxed text-muted">
                 {biz.address}
                 <br />
                 {biz.phone} · {biz.email}
@@ -117,9 +117,9 @@ function InvoiceInner() {
               </div>
             </div>
             <div className="sm:text-right">
-              <div className="text-[11px] font-semibold tracking-[0.14em] text-brand uppercase">Tax invoice</div>
+              <div className="text-micro font-semibold tracking-[0.14em] text-brand uppercase">Tax invoice</div>
               <div className="mt-1 font-mono text-[20px] font-semibold text-ink">{sale.invoiceNo}</div>
-              <dl className="mt-3 grid grid-cols-[auto_auto] gap-x-4 gap-y-1 text-[12.5px] sm:justify-end">
+              <dl className="mt-3 grid grid-cols-[auto_auto] gap-x-4 gap-y-1 text-small sm:justify-end">
                 <dt className="text-muted">Invoice date</dt>
                 <dd className="font-medium text-ink">{formatDate(sale.date)}</dd>
                 <dt className="text-muted">Payment</dt>
@@ -131,10 +131,10 @@ function InvoiceInner() {
           </div>
 
           {/* Bill to */}
-          <div className="mt-8 grid gap-6 rounded-[12px] bg-subtle p-5 sm:grid-cols-2">
+          <div className="mt-8 grid gap-6 rounded-card bg-subtle p-5 sm:grid-cols-2">
             <div>
-              <div className="text-[11px] font-semibold tracking-[0.1em] text-faint uppercase">Bill to</div>
-              <div className="mt-1.5 text-[14px] font-semibold text-ink">
+              <div className="text-micro font-semibold tracking-[0.1em] text-faint uppercase">Bill to</div>
+              <div className="mt-1.5 text-title-sm font-semibold text-ink">
                 {customer ? (
                   <Link href={`/customers/${customer.id}`} className="hover:text-brand">
                     {customer.company || sale.customerName}
@@ -143,12 +143,12 @@ function InvoiceInner() {
                   sale.customerName
                 )}
               </div>
-              {customer?.company && <div className="text-[12.5px] text-ink-2">Attn: {customer.name}</div>}
-              {customer && <div className="mt-1 max-w-[300px] text-[12px] leading-relaxed text-muted">{customer.address}</div>}
+              {customer?.company && <div className="text-small text-ink-2">Attn: {customer.name}</div>}
+              {customer && <div className="mt-1 max-w-[300px] text-small leading-relaxed text-muted">{customer.address}</div>}
             </div>
             {customer && (
-              <div className="text-[12.5px] sm:text-right">
-                <div className="text-[11px] font-semibold tracking-[0.1em] text-faint uppercase">Contact</div>
+              <div className="text-small sm:text-right">
+                <div className="text-micro font-semibold tracking-[0.1em] text-faint uppercase">Contact</div>
                 <div className="mt-1.5 text-ink-2">{customer.email}</div>
                 <div className="text-ink-2">{customer.phone}</div>
                 {customer.gstin && (
@@ -162,9 +162,9 @@ function InvoiceInner() {
 
           {/* Items */}
           <div className="mt-8 overflow-x-auto">
-            <table className="w-full min-w-[520px] text-[13px]">
+            <table className="w-full min-w-[520px] text-body">
               <thead>
-                <tr className="border-b-2 border-ink text-left text-[11px] font-semibold tracking-wide text-ink uppercase">
+                <tr className="border-b-2 border-ink text-left text-micro font-semibold tracking-wide text-ink uppercase">
                   <th className="py-2 pr-3">#</th>
                   <th className="py-2 pr-3">Item</th>
                   <th className="py-2 pr-3 text-right">Qty</th>
@@ -178,7 +178,7 @@ function InvoiceInner() {
                     <td className="py-3 pr-3 text-muted tabular">{idx + 1}</td>
                     <td className="py-3 pr-3">
                       <div className="font-medium text-ink">{i.name}</div>
-                      <div className="font-mono text-[11.5px] text-muted">{i.sku}</div>
+                      <div className="font-mono text-caption text-muted">{i.sku}</div>
                     </td>
                     <td className="py-3 pr-3 text-right tabular">
                       {i.quantity} <span className="text-muted">{i.unit}</span>
@@ -193,16 +193,16 @@ function InvoiceInner() {
 
           {/* Totals */}
           <div className="mt-6 flex flex-col-reverse justify-between gap-6 sm:flex-row">
-            <div className="max-w-[340px] text-[12px] leading-relaxed text-muted">
+            <div className="max-w-[340px] text-small leading-relaxed text-muted">
               {sale.notes && (
                 <>
-                  <div className="text-[11px] font-semibold tracking-[0.1em] text-faint uppercase">Notes</div>
+                  <div className="text-micro font-semibold tracking-[0.1em] text-faint uppercase">Notes</div>
                   <p className="mt-1 text-ink-2">{sale.notes}</p>
                 </>
               )}
               <p className="mt-4">Thank you for your business. Goods once sold will be exchanged only as per warranty terms.</p>
             </div>
-            <dl className="w-full space-y-2 text-[13px] sm:w-[300px]">
+            <dl className="w-full space-y-2 text-body sm:w-[300px]">
               <div className="flex justify-between">
                 <dt className="text-muted">Subtotal</dt>
                 <dd className="tabular">{formatCurrency(sale.subtotal)}</dd>
@@ -240,7 +240,7 @@ function InvoiceInner() {
             </dl>
           </div>
 
-          <div className="mt-10 flex items-end justify-between border-t border-line pt-5 text-[11.5px] text-faint">
+          <div className="mt-10 flex items-end justify-between border-t border-line pt-5 text-caption text-faint">
             <span>Computer-generated invoice · {biz.businessName}</span>
             <span className="text-right">
               For {biz.businessName}

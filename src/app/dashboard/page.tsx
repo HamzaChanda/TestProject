@@ -29,7 +29,7 @@ import {
   getDashboardKpis,
   getLowStockProducts,
   getMonthlySeries,
-  getProductSalesStats,
+  getReplenishment,
   rangeFromPreset,
   type RangePreset,
 } from "@/lib/selectors";
@@ -79,6 +79,11 @@ export default function DashboardPage() {
     ]);
   };
 
+  // Replenishment advice per low-stock product (cover days, suggested order quantity).
+  const adviceById = useMemo(() => new Map(lowStock.map((p) => [p.id, getReplenishment(state, p)])), [lowStock, state]);
+  const advice = (p: Product) => adviceById.get(p.id) ?? getReplenishment(state, p);
+  const reorderHref = (p: Product) => `/purchases/new?product=${p.id}${advice(p).suggestedQty > 0 ? `&qty=${advice(p).suggestedQty}` : ""}`;
+
   const lowColumns: Column<Product>[] = [
     {
       key: "product",
@@ -89,7 +94,10 @@ export default function DashboardPage() {
           <ProductThumb name={p.name} category={p.category} size={32} />
           <span className="min-w-0">
             <span className="block truncate font-medium text-ink hover:text-brand">{p.name}</span>
-            <span className="block font-mono text-[11.5px] text-muted">{p.sku}</span>
+            <span className="block text-caption text-muted">
+              <span className="font-mono">{p.sku}</span>
+              <CoverHint days={advice(p).daysOfCover} qty={totalStock(p)} />
+            </span>
           </span>
         </Link>
       ),
@@ -103,20 +111,28 @@ export default function DashboardPage() {
         <div className="ml-auto w-[104px]">
           <div className="mb-1 text-right tabular">
             <span className="font-semibold text-ink">{totalStock(p)}</span>
-            <span className="text-[12px] text-muted"> / {p.minStock}</span>
+            <span className="text-small text-muted"> / {p.minStock}</span>
           </div>
           <StockBar qty={totalStock(p)} min={p.minStock} />
         </div>
       ),
     },
     {
-      key: "incoming",
-      hideBelow: "desktop",
-      header: "Incoming",
+      key: "suggest",
+      header: "Suggested",
       align: "right",
+      sortValue: (p) => advice(p).suggestedQty,
       cell: (p) => {
-        const inc = getProductSalesStats(state, p.id).incoming;
-        return inc ? <span className="font-medium text-info tabular">+{inc}</span> : <span className="text-faint">—</span>;
+        const a = advice(p);
+        return a.suggestedQty > 0 ? (
+          <span className="font-semibold text-ink tabular" title={`Restores stock to ${a.targetLevel} (minimum + 30 days of demand), after ${a.incoming} already on order`}>
+            {a.suggestedQty}
+          </span>
+        ) : (
+          <span className="text-caption text-success" title={a.incoming ? `${a.incoming} already on order` : undefined}>
+            {a.incoming ? `+${a.incoming} on order` : "Covered"}
+          </span>
+        );
       },
     },
     { key: "status", header: "Status", cell: (p) => <StatusBadge status={productStatus(p)} /> },
@@ -126,16 +142,22 @@ export default function DashboardPage() {
       align: "right",
       cell: (p) => (
         <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-          <span className="hidden 2xl:inline-flex">
-            <ButtonLink href={`/purchases/new?product=${p.id}`} size="xs" variant="subtle" icon={<ShoppingCart className="h-3.5 w-3.5" />}>
-              Reorder
-            </ButtonLink>
-          </span>
+          {advice(p).suggestedQty > 0 && (
+            <span className="hidden 2xl:inline-flex">
+              <ButtonLink href={reorderHref(p)} size="xs" variant="subtle" icon={<ShoppingCart className="h-3.5 w-3.5" />}>
+                Order {advice(p).suggestedQty}
+              </ButtonLink>
+            </span>
+          )}
           <Dropdown
             width={200}
             items={[
               { label: "View product", icon: <Eye />, href: `/products/${p.id}` },
-              { label: "Create purchase order", icon: <ShoppingCart />, href: `/purchases/new?product=${p.id}` },
+              {
+                label: advice(p).suggestedQty > 0 ? `Order ${advice(p).suggestedQty} units` : "Create purchase order",
+                icon: <ShoppingCart />,
+                href: reorderHref(p),
+              },
             ]}
             trigger={({ toggle }) => (
               <Button size="icon-sm" variant="ghost" onClick={toggle} aria-label={`Actions for ${p.name}`}>
@@ -226,14 +248,14 @@ export default function DashboardPage() {
             icon={<TrendingUp className="h-4 w-4" />}
             actions={
               <div className="hidden text-right sm:block">
-                <div className="text-[11.5px] text-muted">6-month sales</div>
-                <div className="text-[15px] font-semibold text-ink tabular">{formatCurrency(sixMonthSales, { whole: true })}</div>
+                <div className="text-caption text-muted">6-month sales</div>
+                <div className="text-title-sm font-semibold text-ink tabular">{formatCurrency(sixMonthSales, { whole: true })}</div>
               </div>
             }
           />
           <CardBody>
             <SalesPurchasesChart data={monthly} />
-            <div className="mt-3 grid grid-cols-2 gap-3 border-t border-line pt-3 text-[12px] sm:grid-cols-3">
+            <div className="mt-3 grid grid-cols-2 gap-3 border-t border-line pt-3 text-small sm:grid-cols-3">
               <div>
                 <div className="text-muted">Purchases</div>
                 <div className="font-semibold text-ink tabular">{formatCurrency(sixMonthPurchases, { whole: true })}</div>
@@ -287,14 +309,15 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* Alerts + activity */}
-      <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)]">
+      {/* Alerts + activity. The actionable table gets the room: side-by-side with a slim
+          activity column on wide screens, full width (activity below) on smaller ones. */}
+      <div className="mt-5 grid grid-cols-1 gap-5 min-[1380px]:grid-cols-[minmax(0,1fr)_340px]">
         <Card className="overflow-hidden">
           <CardHeader
             title={
               <span className="flex items-center gap-2">
                 Low stock alerts
-                {lowStock.length > 0 && <span className="rounded-md bg-warning-bg px-1.5 py-px text-[11.5px] font-semibold text-warning tabular">{lowStock.length}</span>}
+                {lowStock.length > 0 && <span className="rounded-md bg-warning-bg px-1.5 py-px text-caption font-semibold text-warning tabular">{lowStock.length}</span>}
               </span>
             }
             description="Products at or below their minimum stock level"
@@ -346,4 +369,11 @@ export default function DashboardPage() {
       <TransferDialog open={transferOpen} onClose={() => setTransferOpen(false)} />
     </>
   );
+}
+
+/** "· 4 days left" — how long current stock lasts at the 90-day sales rate. */
+function CoverHint({ days, qty }: { days: number | null; qty: number }) {
+  if (qty <= 0) return <span className="text-danger"> · sold out</span>;
+  if (days === null) return <span> · no recent sales</span>;
+  return <span className={days <= 7 ? "text-danger" : days <= 21 ? "text-warning" : undefined}> · {days} day{days === 1 ? "" : "s"} left</span>;
 }

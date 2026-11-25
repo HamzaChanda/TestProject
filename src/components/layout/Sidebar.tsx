@@ -52,8 +52,8 @@ export function Sidebar({
           <Logo />
           {!collapsed && (
             <div className="min-w-0 leading-tight">
-              <div className="text-[14.5px] font-semibold tracking-[-0.01em] text-ink">StockFlow</div>
-              <div className="truncate text-[11.5px] text-muted">Inventory &amp; Operations</div>
+              <div className="text-title-sm font-semibold tracking-[-0.01em] text-ink">StockFlow</div>
+              <div className="truncate text-caption text-muted">Inventory &amp; Operations</div>
             </div>
           )}
         </Link>
@@ -66,7 +66,7 @@ export function Sidebar({
             {collapsed ? (
               i > 0 && <div className="mx-2 mb-3 h-px bg-line" />
             ) : (
-              <div className="mb-1.5 px-2.5 text-[10.5px] font-semibold tracking-[0.08em] text-faint uppercase">{section.title}</div>
+              <div className="mb-1.5 px-2.5 text-micro font-semibold tracking-[0.08em] text-faint uppercase">{section.title}</div>
             )}
             <ul className="space-y-0.5">
               {section.items.map((item) => {
@@ -79,9 +79,9 @@ export function Sidebar({
                       href={item.href}
                       onClick={() => go(item.href)}
                       className={cn(
-                        "group/nav relative flex h-9 items-center gap-2.5 rounded-[9px] text-[13.5px] font-medium transition-colors",
+                        "group/nav relative flex h-9 items-center gap-2.5 rounded-control text-ui font-medium transition-colors",
                         collapsed ? "justify-center px-0" : "px-2.5",
-                        active ? "bg-brand-50 text-brand" : "text-ink-2 hover:bg-[#f3f4f7] hover:text-ink",
+                        active ? "bg-brand-50 text-brand" : "text-ink-2 hover:bg-hover hover:text-ink",
                       )}
                       aria-current={active ? "page" : undefined}
                     >
@@ -91,18 +91,19 @@ export function Sidebar({
                       {!collapsed && badge > 0 && (
                         <span
                           className={cn(
-                            "rounded-md px-1.5 py-px text-[11px] font-semibold tabular",
-                            item.href === "/stock" ? "bg-warning-bg text-warning" : "bg-[#f1f2f5] text-ink-2",
+                            "rounded-md px-1.5 py-px text-micro font-semibold tabular",
+                            item.href === "/stock" ? "bg-warning-bg text-warning" : "bg-hover text-ink-2",
                           )}
                         >
                           {badge}
                         </span>
                       )}
-                      {collapsed && badge > 0 && <span className="absolute top-1.5 right-2 h-1.5 w-1.5 rounded-full bg-[#f59e0b]" />}
+                      {collapsed && badge > 0 && <span className="absolute top-1.5 right-2 h-1.5 w-1.5 rounded-full bg-warning-solid" />}
                       {collapsed && (
-                        <span className="pointer-events-none absolute top-1/2 left-[calc(100%+12px)] z-50 -translate-y-1/2 rounded-md bg-ink px-2 py-1 text-[12px] font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover/nav:opacity-100">
+                        <span className="pointer-events-none absolute top-1/2 left-[calc(100%+12px)] z-50 -translate-y-1/2 rounded-md bg-ink px-2 py-1 text-small font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover/nav:opacity-100">
                           {item.label}
                           {badge > 0 ? ` · ${badge}` : ""}
+                          <span className="ml-2 text-white/55">G {item.key.toUpperCase()}</span>
                         </span>
                       )}
                     </Link>
@@ -133,8 +134,8 @@ export function Sidebar({
               <button
                 onClick={toggle}
                 className={cn(
-                  "flex w-full items-center gap-2.5 rounded-[10px] p-1.5 text-left transition-colors hover:bg-[#f3f4f7]",
-                  open && "bg-[#f3f4f7]",
+                  "flex w-full items-center gap-2.5 rounded-panel p-1.5 text-left transition-colors hover:bg-hover",
+                  open && "bg-hover",
                   collapsed && "w-auto",
                 )}
                 aria-label="Open profile menu"
@@ -143,8 +144,8 @@ export function Sidebar({
                 {!collapsed && (
                   <>
                     <div className="min-w-0 flex-1 leading-tight">
-                      <div className="truncate text-[13px] font-medium text-ink">{USER.name}</div>
-                      <div className="truncate text-[11.5px] text-muted">{USER.role}</div>
+                      <div className="truncate text-body font-medium text-ink">{USER.name}</div>
+                      <div className="truncate text-caption text-muted">{USER.role}</div>
                     </div>
                     <MoreHorizontal className="h-4 w-4 text-muted" />
                   </>
@@ -157,7 +158,7 @@ export function Sidebar({
           <button
             onClick={onToggleCollapse}
             className={cn(
-              "mt-2 flex h-8 w-full items-center gap-2 rounded-[8px] px-2.5 text-[12.5px] text-muted transition-colors hover:bg-[#f3f4f7] hover:text-ink",
+              "mt-2 flex h-8 w-full items-center gap-2 rounded-control px-2.5 text-small text-muted transition-colors hover:bg-hover hover:text-ink",
               collapsed && "justify-center px-0",
             )}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -187,16 +188,16 @@ function BottomItem({
   active?: boolean;
 }) {
   const cls = cn(
-    "group/nav relative flex h-9 w-full items-center gap-2.5 rounded-[9px] text-[13.5px] font-medium transition-colors [&>svg]:h-[17px] [&>svg]:w-[17px] [&>svg]:shrink-0",
+    "group/nav relative flex h-9 w-full items-center gap-2.5 rounded-control text-ui font-medium transition-colors [&>svg]:h-[17px] [&>svg]:w-[17px] [&>svg]:shrink-0",
     collapsed ? "justify-center" : "px-2.5",
-    active ? "bg-brand-50 text-brand [&>svg]:text-brand" : "text-ink-2 hover:bg-[#f3f4f7] hover:text-ink [&>svg]:text-muted",
+    active ? "bg-brand-50 text-brand [&>svg]:text-brand" : "text-ink-2 hover:bg-hover hover:text-ink [&>svg]:text-muted",
   );
   const content = (
     <>
       {icon}
       {!collapsed && <span>{label}</span>}
       {collapsed && (
-        <span className="pointer-events-none absolute top-1/2 left-[calc(100%+12px)] z-50 -translate-y-1/2 rounded-md bg-ink px-2 py-1 text-[12px] font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover/nav:opacity-100">
+        <span className="pointer-events-none absolute top-1/2 left-[calc(100%+12px)] z-50 -translate-y-1/2 rounded-md bg-ink px-2 py-1 text-small font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover/nav:opacity-100">
           {label}
         </span>
       )}

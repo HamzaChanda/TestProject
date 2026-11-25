@@ -139,15 +139,15 @@ function NewSaleInner() {
               </Field>
             </div>
             {customer && customerStats && (
-              <div className="mt-3 flex flex-wrap items-center gap-3 rounded-[10px] border border-line bg-subtle px-3.5 py-2.5">
+              <div className="mt-3 flex flex-wrap items-center gap-3 rounded-panel border border-line bg-subtle px-3.5 py-2.5">
                 <Avatar name={customer.name} size={32} />
-                <div className="min-w-0 flex-1 text-[12.5px]">
+                <div className="min-w-0 flex-1 text-small">
                   <div className="font-medium text-ink">{customer.company || customer.name}</div>
                   <div className="truncate text-muted">
                     {customer.email} · {customer.phone}
                   </div>
                 </div>
-                <div className="text-right text-[12px]">
+                <div className="text-right text-small">
                   <div className="text-muted">{customerStats.orders} orders</div>
                   {customerStats.outstanding > 0 ? (
                     <div className="font-medium text-danger">{formatCurrency(customerStats.outstanding)} due</div>
@@ -166,11 +166,11 @@ function NewSaleInner() {
             description="Search and add products. Quantities are checked against available stock."
             complete={fields.length > 0 && stockIssues.length === 0}
             actions={
-              <label className="flex items-center gap-2 text-[12.5px] text-muted">
+              <label className="flex items-center gap-2 text-small text-muted">
                 <Warehouse className="h-3.5 w-3.5" />
                 <select
                   {...register("warehouseId")}
-                  className="h-8 cursor-pointer rounded-[8px] border border-line-strong bg-surface px-2 text-[12.5px] text-ink focus:border-brand focus:outline-none"
+                  className="h-8 cursor-pointer rounded-control border border-line-strong bg-surface px-2 text-small text-ink focus:border-brand focus:outline-none"
                 >
                   {state.warehouses.map((w) => (
                     <option key={w.id} value={w.id}>
@@ -191,12 +191,12 @@ function NewSaleInner() {
             />
 
             {fields.length === 0 ? (
-              <div className="mt-3 rounded-[10px] border border-line">
+              <div className="mt-3 rounded-panel border border-line">
                 <EmptyState compact icon={<ReceiptText />} title="No products added" description="Use the search above to add products to this invoice." />
               </div>
             ) : (
-              <div className="mt-3 overflow-hidden rounded-[10px] border border-line">
-                <div className="hidden grid-cols-[minmax(0,1fr)_130px_120px_110px_36px] gap-3 border-b border-line bg-subtle px-3.5 py-2 text-[11px] font-medium tracking-wide text-muted uppercase md:grid">
+              <div className="mt-3 overflow-hidden rounded-panel border border-line">
+                <div className="hidden grid-cols-[minmax(0,1fr)_130px_120px_110px_36px] gap-3 border-b border-line bg-subtle px-3.5 py-2 text-micro font-medium tracking-wide text-muted uppercase md:grid">
                   <span>Product</span>
                   <span>Quantity</span>
                   <span>Unit price</span>
@@ -216,14 +216,14 @@ function NewSaleInner() {
                         <div className="col-span-2 flex min-w-0 items-center gap-3 md:col-span-1">
                           {p && <ProductThumb name={p.name} category={p.category} size={32} />}
                           <div className="min-w-0">
-                            <div className="truncate text-[13px] font-medium text-ink">{p?.name ?? "Unknown product"}</div>
-                            <div className={cn("text-[11.5px]", over ? "font-medium text-danger" : available - qty <= (p?.minStock ?? 0) ? "text-warning" : "text-muted")}>
+                            <div className="truncate text-body font-medium text-ink">{p?.name ?? "Unknown product"}</div>
+                            <div className={cn("text-caption", over ? "font-medium text-danger" : available - qty <= (p?.minStock ?? 0) ? "text-warning" : "text-muted")}>
                               <span className="font-mono">{p?.sku}</span> · {available} available
                             </div>
                           </div>
                         </div>
                         <div>
-                          <div className="flex h-9 items-center rounded-[9px] border border-line-strong bg-surface focus-within:border-brand focus-within:ring-[3px] focus-within:ring-brand/15" aria-invalid={over || !!qtyError}>
+                          <div className="flex h-9 items-center rounded-control border border-line-strong bg-surface focus-within:border-brand focus-within:ring-[3px] focus-within:ring-brand/15" aria-invalid={over || !!qtyError}>
                             <button type="button" className="grid h-full w-8 place-items-center text-muted hover:text-ink disabled:opacity-40" onClick={() => setValue(`items.${idx}.quantity`, Math.max(1, qty - 1), { shouldValidate: true })} disabled={qty <= 1} aria-label="Decrease quantity">
                               <Minus className="h-3.5 w-3.5" />
                             </button>
@@ -233,19 +233,19 @@ function NewSaleInner() {
                               step={1}
                               inputMode="numeric"
                               {...register(`items.${idx}.quantity`, { valueAsNumber: true })}
-                              className={cn("h-full w-full min-w-0 bg-transparent text-center text-[13px] font-medium tabular focus:outline-none", over && "text-danger")}
+                              className={cn("h-full w-full min-w-0 bg-transparent text-center text-body font-medium tabular focus:outline-none", over && "text-danger")}
                             />
                             <button type="button" className="grid h-full w-8 place-items-center text-muted hover:text-ink" onClick={() => setValue(`items.${idx}.quantity`, qty + 1, { shouldValidate: true })} aria-label="Increase quantity">
                               <Plus className="h-3.5 w-3.5" />
                             </button>
                           </div>
-                          {(over || qtyError) && <p className="mt-1 text-[11.5px] text-danger">{over ? `Insufficient stock. Available quantity: ${available}` : qtyError}</p>}
+                          {(over || qtyError) && <p className="mt-1 text-caption text-danger">{over ? `Insufficient stock. Available quantity: ${available}` : qtyError}</p>}
                         </div>
                         <div>
                           <Input type="number" step="0.01" min={0} leading={sym} {...register(`items.${idx}.price`, { valueAsNumber: true })} invalid={!!errors.items?.[idx]?.price} className="tabular" />
-                          {errors.items?.[idx]?.price && <p className="mt-1 text-[11.5px] text-danger">{errors.items[idx]?.price?.message}</p>}
+                          {errors.items?.[idx]?.price && <p className="mt-1 text-caption text-danger">{errors.items[idx]?.price?.message}</p>}
                         </div>
-                        <div className="self-center text-right text-[13.5px] font-semibold text-ink tabular md:text-right">{formatCurrency(lineTotal(qty, Number(line?.price) || 0))}</div>
+                        <div className="self-center text-right text-ui font-semibold text-ink tabular md:text-right">{formatCurrency(lineTotal(qty, Number(line?.price) || 0))}</div>
                         <button type="button" onClick={() => remove(idx)} className="grid h-8 w-8 place-items-center justify-self-end rounded-md text-muted transition hover:bg-danger-bg hover:text-danger" aria-label={`Remove ${p?.name}`}>
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -255,8 +255,8 @@ function NewSaleInner() {
                 </ul>
               </div>
             )}
-            {errors.items?.message && <p className="mt-2 text-[12.5px] text-danger">{errors.items.message}</p>}
-            {errors.items?.root?.message && <p className="mt-2 text-[12.5px] text-danger">{errors.items.root.message}</p>}
+            {errors.items?.message && <p className="mt-2 text-small text-danger">{errors.items.message}</p>}
+            {errors.items?.root?.message && <p className="mt-2 text-small text-danger">{errors.items.root.message}</p>}
           </FormSection>
 
           {/* 3. Billing */}
@@ -264,13 +264,13 @@ function NewSaleInner() {
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Discount" error={errors.discountValue?.message}>
                 <div className="flex gap-2">
-                  <div className="flex shrink-0 rounded-[9px] bg-[#eef0f3] p-[3px]">
+                  <div className="flex shrink-0 rounded-control bg-pressed p-[3px]">
                     {(["percent", "amount"] as const).map((t) => (
                       <button
                         type="button"
                         key={t}
                         onClick={() => setValue("discountType", t, { shouldValidate: true })}
-                        className={cn("h-[30px] w-9 rounded-[7px] text-[12.5px] font-semibold transition", watched.discountType === t ? "bg-surface text-ink shadow-sm" : "text-muted")}
+                        className={cn("h-[30px] w-9 rounded-control text-small font-semibold transition", watched.discountType === t ? "bg-surface text-ink shadow-sm" : "text-muted")}
                       >
                         {t === "percent" ? "%" : sym}
                       </button>
@@ -332,18 +332,18 @@ function NewSaleInner() {
         <div className="xl:sticky xl:top-[76px] xl:self-start">
           <Card className="overflow-hidden">
             <div className="border-b border-line px-5 py-4">
-              <h3 className="text-[14.5px] font-semibold text-ink">Summary</h3>
-              <p className="text-[12.5px] text-muted">
+              <h3 className="text-title-sm font-semibold text-ink">Summary</h3>
+              <p className="text-small text-muted">
                 {fields.length} product{fields.length === 1 ? "" : "s"} · {units} unit{units === 1 ? "" : "s"}
               </p>
             </div>
-            <dl className="space-y-2.5 px-5 py-4 text-[13px]">
+            <dl className="space-y-2.5 px-5 py-4 text-body">
               <Row label="Subtotal" value={formatCurrency(totals.subtotal)} />
               <Row label={`Discount${watched.discountType === "percent" && watched.discountValue ? ` (${watched.discountValue}%)` : ""}`} value={totals.discountAmount ? `− ${formatCurrency(totals.discountAmount)}` : formatCurrency(0)} />
               <Row label="Taxable amount" value={formatCurrency(totals.taxableAmount)} muted />
               <Row label={`GST (${watched.taxRate ?? 0}%)`} value={formatCurrency(totals.taxAmount)} />
               <div className="flex items-baseline justify-between border-t border-line pt-3">
-                <dt className="text-[13.5px] font-semibold text-ink">Grand total</dt>
+                <dt className="text-ui font-semibold text-ink">Grand total</dt>
                 <dd className="text-[20px] font-semibold tracking-[-0.01em] text-ink tabular">{formatCurrency(totals.total)}</dd>
               </div>
               {watched.paymentStatus === "Partial" && watched.amountPaid ? (
@@ -351,7 +351,7 @@ function NewSaleInner() {
               ) : null}
             </dl>
             {stockIssues.length > 0 && (
-              <div className="mx-5 mb-4 flex gap-2 rounded-[10px] border border-danger-line bg-danger-bg px-3 py-2.5 text-[12.5px] text-danger">
+              <div className="mx-5 mb-4 flex gap-2 rounded-panel border border-danger-line bg-danger-bg px-3 py-2.5 text-small text-danger">
                 <AlertCircle className="mt-px h-4 w-4 shrink-0" />
                 {stockIssues.length} product{stockIssues.length > 1 ? "s exceed" : " exceeds"} available stock in {state.warehouses.find((w) => w.id === warehouseId)?.name}.
               </div>

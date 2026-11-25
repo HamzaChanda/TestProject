@@ -1,7 +1,7 @@
 export function Logo({ size = 30 }: { size?: number }) {
   return (
     <span
-      className="grid shrink-0 place-items-center rounded-[9px] bg-brand text-white shadow-[0_1px_2px_rgba(16,24,40,0.15),inset_0_1px_0_rgba(255,255,255,0.18)]"
+      className="grid shrink-0 place-items-center rounded-control bg-brand text-white shadow-[0_1px_2px_rgba(16,24,40,0.15),inset_0_1px_0_rgba(255,255,255,0.18)]"
       style={{ width: size, height: size }}
       aria-hidden
     >

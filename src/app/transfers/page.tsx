@@ -43,7 +43,7 @@ export default function TransfersPage() {
   const routes = state.warehouses.flatMap((a) => state.warehouses.filter((b) => b.id !== a.id).map((b) => ({ value: `${a.id}>${b.id}`, label: `${a.name.replace(" Warehouse", "")} → ${b.name.replace(" Warehouse", "")}` })));
 
   const columns: Column<Transfer>[] = [
-    { key: "ref", header: "Reference", sortValue: (t) => t.reference, cell: (t) => <span className="font-mono text-[12.5px] font-medium text-ink">{t.reference}</span> },
+    { key: "ref", header: "Reference", sortValue: (t) => t.reference, cell: (t) => <span className="font-mono text-small font-medium text-ink">{t.reference}</span> },
     {
       key: "product",
       header: "Product",
@@ -57,7 +57,7 @@ export default function TransfersPage() {
           ) : (
             <span className="block max-w-[200px] truncate font-medium text-ink">{t.productName}</span>
           )}
-          <span className="font-mono text-[11.5px] text-muted">{t.sku}</span>
+          <span className="font-mono text-caption text-muted">{t.sku}</span>
         </div>
       ),
     },
@@ -66,12 +66,12 @@ export default function TransfersPage() {
       header: "From → To",
       cell: (t) => (
         <span className="inline-flex items-center gap-1.5">
-          <span className="inline-flex items-center rounded-md border border-line bg-subtle px-1.5 py-0.5 text-[12px] text-ink-2" title={`From ${whName(t.fromWarehouseId)}`}>
+          <span className="inline-flex items-center rounded-md border border-line bg-subtle px-1.5 py-0.5 text-small text-ink-2" title={`From ${whName(t.fromWarehouseId)}`}>
             <span className="sr-only">From </span>
             {whName(t.fromWarehouseId).replace(" Warehouse", "")}
           </span>
           <ArrowRight className="h-3.5 w-3.5 text-faint" />
-          <span className="inline-flex items-center rounded-md border border-brand-100 bg-brand-50 px-1.5 py-0.5 text-[12px] font-medium text-brand-700" title={`To ${whName(t.toWarehouseId)}`}>
+          <span className="inline-flex items-center rounded-md border border-brand-100 bg-brand-50 px-1.5 py-0.5 text-small font-medium text-brand-700" title={`To ${whName(t.toWarehouseId)}`}>
             <span className="sr-only">To </span>
             {whName(t.toWarehouseId).replace(" Warehouse", "")}
           </span>
@@ -87,7 +87,7 @@ export default function TransfersPage() {
       cell: (t) => (
         <div className="flex flex-col items-start gap-0.5">
           <StatusBadge status={t.status} />
-          {t.completedAt && t.status === "Completed" && <span className="text-[11.5px] text-faint">Received {formatDate(t.completedAt, "dd MMM")}</span>}
+          {t.completedAt && t.status === "Completed" && <span className="text-caption text-faint">Received {formatDate(t.completedAt, "dd MMM")}</span>}
         </div>
       ),
     },
@@ -138,15 +138,15 @@ export default function TransfersPage() {
             <CardBody className="pt-5">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <span className="grid h-10 w-10 place-items-center rounded-[10px] bg-brand-50 text-brand">
+                  <span className="grid h-10 w-10 place-items-center rounded-panel bg-brand-50 text-brand">
                     <WarehouseIcon className="h-5 w-5" />
                   </span>
                   <div>
-                    <div className="flex items-center gap-1.5 text-[14.5px] font-semibold text-ink">
+                    <div className="flex items-center gap-1.5 text-title-sm font-semibold text-ink">
                       {w.name}
-                      {w.isDefault && <Star className="h-3.5 w-3.5 fill-[#f59e0b] text-[#f59e0b]" aria-label="Default warehouse" />}
+                      {w.isDefault && <Star className="h-3.5 w-3.5 fill-warning-solid text-warning-solid" aria-label="Default warehouse" />}
                     </div>
-                    <div className="flex items-center gap-1 text-[12px] text-muted">
+                    <div className="flex items-center gap-1 text-small text-muted">
                       <MapPin className="h-3 w-3" /> {w.location} · {w.code}
                     </div>
                   </div>
@@ -154,16 +154,16 @@ export default function TransfersPage() {
               </div>
               <dl className="mt-4 grid grid-cols-3 gap-3 border-t border-line pt-4">
                 <div>
-                  <dt className="text-[11.5px] text-muted">Units</dt>
-                  <dd className="text-[16px] font-semibold text-ink tabular">{formatNumber(w.units)}</dd>
+                  <dt className="text-caption text-muted">Units</dt>
+                  <dd className="text-title font-semibold text-ink tabular">{formatNumber(w.units)}</dd>
                 </div>
                 <div>
-                  <dt className="text-[11.5px] text-muted">SKUs</dt>
-                  <dd className="text-[16px] font-semibold text-ink tabular">{w.skus}</dd>
+                  <dt className="text-caption text-muted">SKUs</dt>
+                  <dd className="text-title font-semibold text-ink tabular">{w.skus}</dd>
                 </div>
                 <div>
-                  <dt className="text-[11.5px] text-muted">Value</dt>
-                  <dd className="text-[16px] font-semibold text-ink tabular">{formatCurrency(w.value, { whole: true })}</dd>
+                  <dt className="text-caption text-muted">Value</dt>
+                  <dd className="text-title font-semibold text-ink tabular">{formatCurrency(w.value, { whole: true })}</dd>
                 </div>
               </dl>
             </CardBody>
@@ -172,22 +172,22 @@ export default function TransfersPage() {
         <Card className={cn(inTransit.length ? "border-info-line" : "")}>
           <CardBody className="pt-5">
             <div className="flex items-center gap-3">
-              <span className="grid h-10 w-10 place-items-center rounded-[10px] bg-info-bg text-info">
+              <span className="grid h-10 w-10 place-items-center rounded-panel bg-info-bg text-info">
                 <Truck className="h-5 w-5" />
               </span>
               <div>
-                <div className="text-[14.5px] font-semibold text-ink">In transit</div>
-                <div className="text-[12px] text-muted">Dispatched, not yet received</div>
+                <div className="text-title-sm font-semibold text-ink">In transit</div>
+                <div className="text-small text-muted">Dispatched, not yet received</div>
               </div>
             </div>
             <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-line pt-4">
               <div>
-                <dt className="text-[11.5px] text-muted">Transfers</dt>
-                <dd className="text-[16px] font-semibold text-ink tabular">{inTransit.length}</dd>
+                <dt className="text-caption text-muted">Transfers</dt>
+                <dd className="text-title font-semibold text-ink tabular">{inTransit.length}</dd>
               </div>
               <div>
-                <dt className="text-[11.5px] text-muted">Units</dt>
-                <dd className="text-[16px] font-semibold text-ink tabular">{inTransitUnits}</dd>
+                <dt className="text-caption text-muted">Units</dt>
+                <dd className="text-title font-semibold text-ink tabular">{inTransitUnits}</dd>
               </div>
             </dl>
           </CardBody>

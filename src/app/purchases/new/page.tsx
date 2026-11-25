@@ -7,7 +7,9 @@ import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addDays, format } from "date-fns";
 import { FileClock, Info, ShoppingCart, Trash2, Warehouse } from "lucide-react";
+import type { Product } from "@/types";
 import { useInventory } from "@/context/InventoryContext";
+import { getReplenishment } from "@/lib/selectors";
 import { purchaseSchema, type PurchaseFormValues } from "@/lib/validations";
 import { computePurchaseTotals, lineTotal, totalStock } from "@/lib/calc";
 import { TAX_PRESETS } from "@/lib/constants";
@@ -20,9 +22,6 @@ import { FormSection } from "@/components/forms/FormSection";
 import { ProductPicker } from "@/components/forms/ProductPicker";
 import { useSubmitGuard } from "@/hooks/useSubmitGuard";
 
-function suggestedQty(stock: number, min: number) {
-  return Math.max(min * 2 - stock, min, 1);
-}
 
 function NewPurchaseInner() {
   const { state, actions } = useInventory();
@@ -32,10 +31,13 @@ function NewPurchaseInner() {
   const { guard, pending } = useSubmitGuard();
   const defaultWh = state.warehouses.find((w) => w.isDefault)?.id ?? state.warehouses[0].id;
 
+  // Suggested quantity comes from the shared replenishment model (min level + 30 days of demand − on order).
+  const suggestedFor = (p: Product) => Math.max(getReplenishment(state, p).suggestedQty, p.minStock, 1);
+
   const initial = useMemo(() => {
     const p = state.products.find((x) => x.id === params.get("product"));
     return p
-      ? { supplierId: params.get("supplier") ?? p.supplierId ?? "", items: [{ productId: p.id, quantity: suggestedQty(totalStock(p), p.minStock), price: p.costPrice }] }
+      ? { supplierId: params.get("supplier") ?? p.supplierId ?? "", items: [{ productId: p.id, quantity: Number(params.get("qty")) > 0 ? Number(params.get("qty")) : suggestedFor(p), price: p.costPrice }] }
       : { supplierId: params.get("supplier") ?? "", items: [] };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -122,7 +124,7 @@ function NewPurchaseInner() {
               </Field>
             </div>
             {supplier && (
-              <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 rounded-[10px] border border-line bg-subtle px-3.5 py-2.5 text-[12.5px]">
+              <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 rounded-panel border border-line bg-subtle px-3.5 py-2.5 text-small">
                 <span className="text-muted">
                   Contact <span className="font-medium text-ink">{supplier.contactPerson}</span>
                 </span>
@@ -140,9 +142,9 @@ function NewPurchaseInner() {
             description="Quantities and agreed purchase prices."
             complete={fields.length > 0}
             actions={
-              <label className="flex items-center gap-2 text-[12.5px] text-muted">
+              <label className="flex items-center gap-2 text-small text-muted">
                 <Warehouse className="h-3.5 w-3.5" /> Deliver to
-                <select {...register("warehouseId")} className="h-8 cursor-pointer rounded-[8px] border border-line-strong bg-surface px-2 text-[12.5px] text-ink focus:border-brand focus:outline-none">
+                <select {...register("warehouseId")} className="h-8 cursor-pointer rounded-control border border-line-strong bg-surface px-2 text-small text-ink focus:border-brand focus:outline-none">
                   {state.warehouses.map((w) => (
                     <option key={w.id} value={w.id}>
                       {w.name}
@@ -157,17 +159,17 @@ function NewPurchaseInner() {
               excludeIds={items.map((i) => i?.productId ?? "")}
               stockOf={(p) => totalStock(p)}
               priceOf={(p) => p.costPrice}
-              onPick={(p) => append({ productId: p.id, quantity: suggestedQty(totalStock(p), p.minStock), price: p.costPrice })}
+              onPick={(p) => append({ productId: p.id, quantity: suggestedFor(p), price: p.costPrice })}
             />
             {lowFromSupplier.length > 0 && (
-              <div className="mt-3 flex flex-wrap items-center gap-2 rounded-[10px] border border-warning-line bg-warning-bg px-3 py-2 text-[12.5px] text-warning">
+              <div className="mt-3 flex flex-wrap items-center gap-2 rounded-panel border border-warning-line bg-warning-bg px-3 py-2 text-small text-warning">
                 <Info className="h-4 w-4" />
                 <span>Low stock from this supplier:</span>
                 {lowFromSupplier.map((p) => (
                   <button
                     type="button"
                     key={p.id}
-                    onClick={() => append({ productId: p.id, quantity: suggestedQty(totalStock(p), p.minStock), price: p.costPrice })}
+                    onClick={() => append({ productId: p.id, quantity: suggestedFor(p), price: p.costPrice })}
                     className="rounded-full border border-warning-line bg-surface px-2 py-0.5 font-medium text-ink-2 hover:border-warning"
                   >
                     + {p.name}
@@ -176,12 +178,12 @@ function NewPurchaseInner() {
               </div>
             )}
             {fields.length === 0 ? (
-              <div className="mt-3 rounded-[10px] border border-line">
+              <div className="mt-3 rounded-panel border border-line">
                 <EmptyState compact icon={<ShoppingCart />} title="No products on this order" description="Search above to add products to restock." />
               </div>
             ) : (
-              <div className="mt-3 overflow-hidden rounded-[10px] border border-line">
-                <div className="hidden grid-cols-[minmax(0,1fr)_100px_130px_110px_36px] gap-3 border-b border-line bg-subtle px-3.5 py-2 text-[11px] font-medium tracking-wide text-muted uppercase md:grid">
+              <div className="mt-3 overflow-hidden rounded-panel border border-line">
+                <div className="hidden grid-cols-[minmax(0,1fr)_100px_130px_110px_36px] gap-3 border-b border-line bg-subtle px-3.5 py-2 text-micro font-medium tracking-wide text-muted uppercase md:grid">
                   <span>Product</span>
                   <span>Quantity</span>
                   <span>Purchase price</span>
@@ -198,21 +200,21 @@ function NewPurchaseInner() {
                         <div className="col-span-2 flex min-w-0 items-center gap-3 md:col-span-1">
                           {p && <ProductThumb name={p.name} category={p.category} size={32} />}
                           <div className="min-w-0">
-                            <div className="truncate text-[13px] font-medium text-ink">{p?.name}</div>
-                            <div className={cn("text-[11.5px]", p && stock <= p.minStock ? "text-warning" : "text-muted")}>
+                            <div className="truncate text-body font-medium text-ink">{p?.name}</div>
+                            <div className={cn("text-caption", p && stock <= p.minStock ? "text-warning" : "text-muted")}>
                               <span className="font-mono">{p?.sku}</span> · {stock} in stock · min {p?.minStock}
                             </div>
                           </div>
                         </div>
                         <div>
                           <Input type="number" min={1} step={1} inputMode="numeric" {...register(`items.${idx}.quantity`, { valueAsNumber: true })} invalid={!!errors.items?.[idx]?.quantity} className="tabular" />
-                          {errors.items?.[idx]?.quantity && <p className="mt-1 text-[11.5px] text-danger">{errors.items[idx]?.quantity?.message}</p>}
+                          {errors.items?.[idx]?.quantity && <p className="mt-1 text-caption text-danger">{errors.items[idx]?.quantity?.message}</p>}
                         </div>
                         <div>
                           <Input type="number" min={0} step="0.01" leading={sym} {...register(`items.${idx}.price`, { valueAsNumber: true })} invalid={!!errors.items?.[idx]?.price} className="tabular" />
-                          {errors.items?.[idx]?.price && <p className="mt-1 text-[11.5px] text-danger">{errors.items[idx]?.price?.message}</p>}
+                          {errors.items?.[idx]?.price && <p className="mt-1 text-caption text-danger">{errors.items[idx]?.price?.message}</p>}
                         </div>
-                        <div className="self-center text-right text-[13.5px] font-semibold text-ink tabular">{formatCurrency(lineTotal(Number(line?.quantity) || 0, Number(line?.price) || 0))}</div>
+                        <div className="self-center text-right text-ui font-semibold text-ink tabular">{formatCurrency(lineTotal(Number(line?.quantity) || 0, Number(line?.price) || 0))}</div>
                         <button type="button" onClick={() => remove(idx)} className="grid h-8 w-8 place-items-center justify-self-end rounded-md text-muted transition hover:bg-danger-bg hover:text-danger" aria-label={`Remove ${p?.name}`}>
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -222,7 +224,7 @@ function NewPurchaseInner() {
                 </ul>
               </div>
             )}
-            {errors.items?.message && <p className="mt-2 text-[12.5px] text-danger">{errors.items.message}</p>}
+            {errors.items?.message && <p className="mt-2 text-small text-danger">{errors.items.message}</p>}
           </FormSection>
 
           <FormSection step={3} title="Tax & notes" complete={!!supplier && fields.length > 0}>
@@ -246,12 +248,12 @@ function NewPurchaseInner() {
         <div className="xl:sticky xl:top-[76px] xl:self-start">
           <Card className="overflow-hidden">
             <div className="border-b border-line px-5 py-4">
-              <h3 className="text-[14.5px] font-semibold text-ink">Order summary</h3>
-              <p className="text-[12.5px] text-muted">
+              <h3 className="text-title-sm font-semibold text-ink">Order summary</h3>
+              <p className="text-small text-muted">
                 {fields.length} product{fields.length === 1 ? "" : "s"} · {units} unit{units === 1 ? "" : "s"}
               </p>
             </div>
-            <dl className="space-y-2.5 px-5 py-4 text-[13px]">
+            <dl className="space-y-2.5 px-5 py-4 text-body">
               <div className="flex justify-between">
                 <dt className="text-muted">Subtotal</dt>
                 <dd className="font-medium tabular">{formatCurrency(totals.subtotal)}</dd>
@@ -261,11 +263,11 @@ function NewPurchaseInner() {
                 <dd className="font-medium tabular">{formatCurrency(totals.taxAmount)}</dd>
               </div>
               <div className="flex items-baseline justify-between border-t border-line pt-3">
-                <dt className="text-[13.5px] font-semibold text-ink">Total amount</dt>
+                <dt className="text-ui font-semibold text-ink">Total amount</dt>
                 <dd className="text-[20px] font-semibold tracking-[-0.01em] text-ink tabular">{formatCurrency(totals.total)}</dd>
               </div>
             </dl>
-            <div className="mx-5 mb-4 flex gap-2 rounded-[10px] bg-info-bg px-3 py-2.5 text-[12px] text-info">
+            <div className="mx-5 mb-4 flex gap-2 rounded-panel bg-info-bg px-3 py-2.5 text-small text-info">
               <Info className="mt-px h-4 w-4 shrink-0" />
               Inventory increases only when you receive items on this order.
             </div>

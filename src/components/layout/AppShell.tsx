@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,9 @@ import { CommandPalette } from "./CommandPalette";
 import { HelpDialog } from "./HelpDialog";
 import { Logo } from "./Logo";
 import { NavigationProgress } from "./NavigationProgress";
+import { GO_SHORTCUTS } from "./nav";
+import { useNavigate } from "@/hooks/useNavigate";
+import { pushRecent } from "@/lib/recents";
 
 const COLLAPSE_KEY = "stockflow:sidebar-collapsed";
 
@@ -40,8 +43,9 @@ function useIsTablet() {
 // Shell only ever renders on the client (the provider shows a skeleton until
 // localStorage is hydrated), so reading browser APIs in initial state is safe.
 function Shell({ children }: { children: ReactNode }) {
-  const { actions } = useInventory();
+  const { state, actions } = useInventory();
   const pathname = usePathname();
+  const navigate = useNavigate();
   const [collapsedPref, setCollapsed] = useState(readCollapsed);
   const tablet = useIsTablet();
   const collapsed = collapsedPref || tablet;
@@ -53,16 +57,68 @@ function Shell({ children }: { children: ReactNode }) {
 
   useEffect(() => setMobileOpen(false), [pathname]);
 
+  // Keyboard-first navigation:  Ctrl/⌘K search · Ctrl/⌘\ sidebar · ? shortcuts · G then <key> to jump.
+  const shortcutState = useRef({ goPending: false, timer: 0 });
+  const toggleSidebarRef = useRef<() => void>(() => {});
   useEffect(() => {
+    const isTyping = (t: EventTarget | null) =>
+      t instanceof HTMLElement && (t.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName));
     const onKey = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key.toLowerCase() === "k") {
+          e.preventDefault();
+          setSearchOpen((o) => !o);
+        } else if (e.key === "\\") {
+          e.preventDefault();
+          toggleSidebarRef.current();
+        }
+        return;
+      }
+      if (e.altKey || isTyping(e.target) || document.querySelector("[data-overlay-panel]")) return;
+      const s = shortcutState.current;
+      if (e.key === "?") {
         e.preventDefault();
-        setSearchOpen((o) => !o);
+        setHelpOpen(true);
+      } else if (e.key.toLowerCase() === "g" && !s.goPending) {
+        s.goPending = true;
+        window.clearTimeout(s.timer);
+        s.timer = window.setTimeout(() => (s.goPending = false), 1200);
+      } else if (s.goPending) {
+        s.goPending = false;
+        const hit = GO_SHORTCUTS.find((g) => g.key === e.key.toLowerCase());
+        if (hit) {
+          e.preventDefault();
+          navigate(hit.href);
+        }
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [navigate]);
+
+  // Remember recently opened records for the command palette.
+  useEffect(() => {
+    const [, section, id] = pathname.split("/");
+    if (!id || id === "new") return;
+    if (section === "sales") {
+      const r = state.sales.find((x) => x.id === id);
+      if (r) pushRecent({ href: pathname, label: r.invoiceNo, sub: r.customerName, kind: "invoice" });
+    } else if (section === "purchases") {
+      const r = state.purchases.find((x) => x.id === id);
+      if (r) pushRecent({ href: pathname, label: r.poNumber, sub: r.supplierName, kind: "purchase" });
+    } else if (section === "products") {
+      const r = state.products.find((x) => x.id === id);
+      if (r) pushRecent({ href: `/products/${id}`, label: r.name, sub: r.sku, kind: "product" });
+    } else if (section === "customers") {
+      const r = state.customers.find((x) => x.id === id);
+      if (r) pushRecent({ href: pathname, label: r.name, sub: r.company || r.email, kind: "customer" });
+    } else if (section === "suppliers") {
+      const r = state.suppliers.find((x) => x.id === id);
+      if (r) pushRecent({ href: pathname, label: r.name, sub: r.contactPerson, kind: "supplier" });
+    }
+    // Only when the route changes — not on every data change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   const toggleCollapsed = () => {
     setCollapsed((c) => {
@@ -73,6 +129,12 @@ function Shell({ children }: { children: ReactNode }) {
       }
       return !c;
     });
+  };
+
+  // Desktop: collapse/expand. Tablet rail & phone: open/close the drawer.
+  toggleSidebarRef.current = () => {
+    if (window.matchMedia("(min-width: 1280px)").matches) toggleCollapsed();
+    else setMobileOpen((o) => !o);
   };
 
   const sidebarProps = { onOpenHelp: () => setHelpOpen(true), onResetData: () => setResetOpen(true) };
@@ -93,7 +155,7 @@ function Shell({ children }: { children: ReactNode }) {
       {/* Mobile drawer */}
       {drawer.mounted && (
         <div className="no-print fixed inset-0 z-[60] md:hidden">
-          <div className={cn("absolute inset-0 bg-[#0f1220]/40", drawer.closing ? "animate-fade-out" : "animate-fade-in")} onClick={() => setMobileOpen(false)} />
+          <div className={cn("absolute inset-0 bg-scrim/40", drawer.closing ? "animate-fade-out" : "animate-fade-in")} onClick={() => setMobileOpen(false)} />
           <div className={cn("absolute inset-y-0 left-0 w-[280px] max-w-[85vw] shadow-[var(--shadow-drawer)]", drawer.closing ? "animate-slide-out-left" : "animate-slide-in-left")}>
             <Sidebar collapsed={false} mobile onNavigate={() => setMobileOpen(false)} {...sidebarProps} />
           </div>
@@ -131,8 +193,8 @@ function LoadingShell() {
         <div className="flex items-center gap-2.5">
           <Logo />
           <div className="hidden xl:block">
-            <div className="text-[14.5px] font-semibold">StockFlow</div>
-            <div className="text-[11.5px] text-muted">Inventory &amp; Operations</div>
+            <div className="text-title-sm font-semibold">StockFlow</div>
+            <div className="text-caption text-muted">Inventory &amp; Operations</div>
           </div>
         </div>
         <div className="mt-8 space-y-2.5">

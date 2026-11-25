@@ -9,10 +9,18 @@
   --color-subtle: #fafbfc;
   --color-ink: #17191f;
   --color-ink-2: #3b3f4a;
-  --color-muted: #747986;
-  --color-faint: #a2a6b1;
+  /* Contrast-checked: muted 5.1:1, faint 3.4:1 on white (previously 4.36:1 / 2.43:1). */
+  --color-muted: #696e7b;
+  --color-faint: #868b98;
   --color-line: #e9ebf0;
   --color-line-strong: #dcdfe6;
+  --color-line-hover: #cbd0d9;
+
+  /* Neutral fills by role (one value per role instead of 7 near-identical greys). */
+  --color-fill: #f2f3f6; /* chips, neutral badges */
+  --color-hover: #f3f4f7; /* hover backgrounds */
+  --color-pressed: #eceef2; /* tracks, segmented controls, pressed */
+  --color-scrim: #0f1220; /* modal / drawer backdrop */
 
   --color-brand: #635bff;
   --color-brand-hover: #5148e5;
@@ -21,9 +29,11 @@
   --color-brand-700: #4338ca;
 
   --color-success: #15803d;
+  --color-success-solid: #22a157;
   --color-success-bg: #ecfdf3;
   --color-success-line: #c6f0d6;
   --color-warning: #b45309;
+  --color-warning-solid: #f59e0b;
   --color-warning-bg: #fff8eb;
   --color-warning-line: #fbe3b4;
   --color-danger: #d92d20;
@@ -33,7 +43,19 @@
   --color-info-bg: #eff6ff;
   --color-info-line: #cfe2fc;
 
+  /* Radius scale tied to elevation: controls < inner panels < raised surfaces. */
+  --radius-control: 8px;
+  --radius-panel: 10px;
   --radius-card: 12px;
+
+  /* Type roles (font-size only; line-height comes from context). */
+  --text-micro: 11px;
+  --text-caption: 11.5px;
+  --text-small: 12.5px;
+  --text-body: 13px;
+  --text-ui: 13.5px;
+  --text-title-sm: 14.5px;
+  --text-title: 16px;
   --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 1px rgba(16, 24, 40, 0.02);
   --shadow-pop: 0 12px 32px -8px rgba(16, 24, 40, 0.16), 0 4px 8px -4px rgba(16, 24, 40, 0.06);
   --shadow-drawer: -16px 0 48px -12px rgba(16, 24, 40, 0.18);

@@ -28,17 +28,17 @@ const META: Record<ActivityType, { icon: LucideIcon; tone: string }> = {
   payment_recorded: { icon: CircleDollarSign, tone: "bg-success-bg text-success" },
   purchase_created: { icon: ShoppingCart, tone: "bg-[#fff1ea] text-[#c2410c]" },
   purchase_received: { icon: PackageCheck, tone: "bg-success-bg text-success" },
-  purchase_cancelled: { icon: Ban, tone: "bg-[#f2f3f6] text-muted" },
+  purchase_cancelled: { icon: Ban, tone: "bg-fill text-muted" },
   product_added: { icon: PackagePlus, tone: "bg-info-bg text-info" },
-  product_updated: { icon: Pencil, tone: "bg-[#f2f3f6] text-ink-2" },
+  product_updated: { icon: Pencil, tone: "bg-fill text-ink-2" },
   product_deleted: { icon: PackageX, tone: "bg-danger-bg text-danger" },
   stock_adjusted: { icon: SlidersHorizontal, tone: "bg-warning-bg text-warning" },
   transfer_created: { icon: ArrowLeftRight, tone: "bg-info-bg text-info" },
   transfer_completed: { icon: ArrowLeftRight, tone: "bg-info-bg text-info" },
-  transfer_cancelled: { icon: ArrowLeftRight, tone: "bg-[#f2f3f6] text-muted" },
+  transfer_cancelled: { icon: ArrowLeftRight, tone: "bg-fill text-muted" },
   customer_added: { icon: UserPlus, tone: "bg-brand-50 text-brand" },
   supplier_added: { icon: Building2, tone: "bg-[#fff1ea] text-[#c2410c]" },
-  settings_updated: { icon: Settings, tone: "bg-[#f2f3f6] text-ink-2" },
+  settings_updated: { icon: Settings, tone: "bg-fill text-ink-2" },
 };
 
 export function ActivityFeed({ activities }: { activities: Activity[] }) {
@@ -54,14 +54,14 @@ export function ActivityFeed({ activities }: { activities: Activity[] }) {
             </span>
             <div className="min-w-0 flex-1 pb-4">
               <div className="flex items-baseline justify-between gap-2">
-                <span className="truncate text-[13px] font-medium text-ink">{a.title}</span>
-                <time className="shrink-0 text-[11.5px] text-faint" title={formatDateTime(a.date)} dateTime={a.date}>
+                <span className="truncate text-body font-medium text-ink">{a.title}</span>
+                <time className="shrink-0 text-caption text-faint" title={formatDateTime(a.date)} dateTime={a.date}>
                   {timeAgo(a.date)}
                 </time>
               </div>
-              <p className="truncate text-[12.5px] text-muted">{a.description}</p>
+              <p className="truncate text-small text-muted">{a.description}</p>
               {a.reference && (
-                <span className="mt-1 inline-block rounded-[5px] bg-[#f2f3f6] px-1.5 py-px font-mono text-[11px] text-ink-2">{a.reference}</span>
+                <span className="mt-1 inline-block rounded-[5px] bg-fill px-1.5 py-px font-mono text-micro text-ink-2">{a.reference}</span>
               )}
             </div>
           </>
@@ -70,7 +70,7 @@ export function ActivityFeed({ activities }: { activities: Activity[] }) {
           <li key={a.id} className="relative">
             {i < activities.length - 1 && <span className="absolute top-8 bottom-0 left-4 w-px -translate-x-1/2 bg-line" />}
             {a.href ? (
-              <Link href={a.href} className="-mx-2 flex gap-3 rounded-[10px] px-2 pt-1 transition-colors hover:bg-subtle">
+              <Link href={a.href} className="-mx-2 flex gap-3 rounded-panel px-2 pt-1 transition-colors hover:bg-subtle">
                 {body}
               </Link>
             ) : (

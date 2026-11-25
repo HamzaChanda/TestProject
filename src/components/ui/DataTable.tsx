@@ -118,7 +118,7 @@ export function DataTable<T>({
                   key={c.key}
                   scope="col"
                   className={cn(
-                    "h-9 px-3.5 text-[11px] font-medium tracking-[0.06em] whitespace-nowrap text-muted uppercase first:pl-5 last:pr-5",
+                    "h-9 px-3.5 text-micro font-medium tracking-[0.06em] whitespace-nowrap text-muted uppercase first:pl-5 last:pr-5",
                     c.hideBelow && HIDE_BELOW[c.hideBelow],
                     c.key === mobileActions && STICKY,
                     c.align === "right" && "text-right",
@@ -169,7 +169,7 @@ export function DataTable<T>({
                   <td
                     key={c.key}
                     className={cn(
-                      "px-3.5 text-[13px] whitespace-nowrap text-ink-2 first:pl-5 last:pr-5",
+                      "px-3.5 text-body whitespace-nowrap text-ink-2 first:pl-5 last:pr-5",
                       dense ? "py-2" : "py-3",
                       c.hideBelow && HIDE_BELOW[c.hideBelow],
                       c.key === mobileActions && STICKY,
@@ -196,9 +196,9 @@ export function DataTable<T>({
             onClick={onRowClick ? () => onRowClick(row) : undefined}
           >
             <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0 flex-1 text-[13.5px]">{primary.cell(row)}</div>
+              <div className="min-w-0 flex-1 text-ui">{primary.cell(row)}</div>
               <div className="flex shrink-0 items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                {trailing && <div className="text-[13px]">{trailing.cell(row)}</div>}
+                {trailing && <div className="text-body">{trailing.cell(row)}</div>}
                 {actions && actions.cell(row)}
               </div>
             </div>
@@ -206,8 +206,8 @@ export function DataTable<T>({
               <dl className="mt-2.5 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-3 md:grid-cols-4">
                 {rest.map((c) => (
                   <div key={c.key} className="min-w-0">
-                    <dt className="text-[11px] font-medium tracking-wide text-faint uppercase">{c.mobileLabel ?? c.header}</dt>
-                    <dd className="mt-0.5 truncate text-[13px] text-ink-2">{c.cell(row)}</dd>
+                    <dt className="text-micro font-medium tracking-wide text-faint uppercase">{c.mobileLabel ?? c.header}</dt>
+                    <dd className="mt-0.5 truncate text-body text-ink-2">{c.cell(row)}</dd>
                   </div>
                 ))}
               </dl>
@@ -217,7 +217,7 @@ export function DataTable<T>({
       </ul>
 
       {sorted.length > pageSize && (
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-4 py-3 text-[12.5px] text-muted md:px-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-4 py-3 text-small text-muted md:px-5">
           <span className="tabular">
             Showing <span className="font-medium text-ink-2">{(current - 1) * pageSize + 1}</span>–
             <span className="font-medium text-ink-2">{Math.min(current * pageSize, sorted.length)}</span> of{" "}
@@ -268,8 +268,8 @@ function PageButton({
   return (
     <button
       className={cn(
-        "grid h-8 min-w-8 place-items-center rounded-[8px] px-2 text-[12.5px] font-medium tabular transition-colors disabled:pointer-events-none disabled:opacity-40",
-        active ? "bg-ink text-white" : "text-ink-2 hover:bg-[#f1f2f5]",
+        "grid h-8 min-w-8 place-items-center rounded-control px-2 text-small font-medium tabular transition-colors disabled:pointer-events-none disabled:opacity-40",
+        active ? "bg-ink text-white" : "text-ink-2 hover:bg-hover",
         className,
       )}
       {...props}

@@ -16,7 +16,7 @@ import {
   subDays,
   subMonths,
 } from "date-fns";
-import type { ID, InventoryState, Purchase, Sale } from "@/types";
+import type { ID, InventoryState, Product, Purchase, Sale } from "@/types";
 import { productStatus, stockValue, totalStock } from "./calc";
 import { round2 } from "./utils";
 
@@ -136,6 +136,50 @@ export function getProductSalesStats(state: InventoryState, productId: ID) {
     .filter((p) => p.status === "Pending" || p.status === "Partially Received")
     .reduce((sum, p) => sum + p.items.filter((i) => i.productId === productId).reduce((s, i) => s + (i.quantity - i.receivedQty), 0), 0);
   return { units, revenue: round2(revenue), incoming };
+}
+
+/* ---------------------------- Replenishment ---------------------------- */
+
+/** Days of demand a reorder should cover beyond the minimum level. */
+export const REORDER_COVER_DAYS = 30;
+const VELOCITY_WINDOW_DAYS = 90;
+
+/** Average units sold per day over the last 90 days (cancelled sales excluded). */
+export function getSalesVelocity(state: InventoryState, productId: ID, now = new Date()) {
+  const since = subDays(now, VELOCITY_WINDOW_DAYS);
+  let units = 0;
+  for (const s of state.sales) {
+    if (!isActiveSale(s) || parseISO(s.date) < since) continue;
+    for (const i of s.items) if (i.productId === productId) units += i.quantity;
+  }
+  return units / VELOCITY_WINDOW_DAYS;
+}
+
+export interface ReplenishmentAdvice {
+  onHand: number;
+  incoming: number;
+  /** Units sold per day (90-day average). */
+  velocity: number;
+  /** Days until on-hand stock runs out at the current rate; null when there are no recent sales. */
+  daysOfCover: number | null;
+  /** Suggested order quantity after counting incoming stock; 0 means no order needed. */
+  suggestedQty: number;
+  /** Stock level the suggestion restores. */
+  targetLevel: number;
+}
+
+/**
+ * Reorder advice: restore stock to the minimum level plus 30 days of demand
+ * (never less than twice the minimum), after counting what is already on order.
+ */
+export function getReplenishment(state: InventoryState, product: Product, now = new Date()): ReplenishmentAdvice {
+  const onHand = totalStock(product);
+  const { incoming } = getProductSalesStats(state, product.id);
+  const velocity = getSalesVelocity(state, product.id, now);
+  const targetLevel = Math.max(product.minStock * 2, Math.ceil(product.minStock + velocity * REORDER_COVER_DAYS));
+  const suggestedQty = Math.max(targetLevel - onHand - incoming, 0);
+  const daysOfCover = velocity > 0 ? Math.floor(onHand / velocity) : null;
+  return { onHand, incoming, velocity, daysOfCover, suggestedQty, targetLevel };
 }
 
 /* ------------------------------- Dashboard ----------------------------- */
@@ -273,6 +317,8 @@ export function getSupplierStats(state: InventoryState, supplierId: ID) {
 
 export interface AppNotification {
   id: string;
+  /** Grouped by type in the notification centre. */
+  group: "Stock" | "Purchasing" | "Payments";
   tone: "danger" | "warning" | "info";
   title: string;
   description: string;
@@ -288,6 +334,7 @@ export function getNotifications(state: InventoryState): AppNotification[] {
       const qty = totalStock(p);
       list.push({
         id: `stock-${p.id}-${qty}`,
+        group: "Stock",
         tone: out ? "danger" : "warning",
         title: out ? `${p.name} is out of stock` : `${p.name} is running low`,
         description: out ? `Minimum level is ${p.minStock}. Raise a purchase order.` : `${qty} left · minimum ${p.minStock}`,
@@ -300,6 +347,7 @@ export function getNotifications(state: InventoryState): AppNotification[] {
     if (isOverdue(p)) {
       list.push({
         id: `overdue-${p.id}-${p.status}`,
+        group: "Purchasing",
         tone: "warning",
         title: `${p.poNumber} is overdue`,
         description: `Expected from ${p.supplierName} on ${format(parseISO(p.expectedDate), "dd MMM")}`,
@@ -312,6 +360,7 @@ export function getNotifications(state: InventoryState): AppNotification[] {
     if (s.status !== "Cancelled" && s.paymentStatus !== "Paid" && differenceInCalendarDays(new Date(), parseISO(s.date)) >= 7) {
       list.push({
         id: `due-${s.id}-${s.amountPaid}`,
+        group: "Payments",
         tone: "info",
         title: `Payment due on ${s.invoiceNo}`,
         description: `${s.customerName} · invoice is ${differenceInCalendarDays(new Date(), parseISO(s.date))} days old`,

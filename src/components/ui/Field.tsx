@@ -3,7 +3,7 @@ import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const control =
-  "w-full rounded-[9px] border border-line-strong bg-surface px-3 text-[13.5px] text-ink placeholder:text-faint shadow-[0_1px_2px_rgba(16,24,40,0.03)] transition-[border,box-shadow] duration-150 hover:border-[#cbd0d9] focus:border-brand focus:outline-none focus:ring-[3px] focus:ring-brand/15 disabled:cursor-not-allowed disabled:bg-subtle disabled:text-muted aria-[invalid=true]:border-danger aria-[invalid=true]:focus:ring-danger/15";
+  "w-full rounded-control border border-line-strong bg-surface px-3 text-ui text-ink placeholder:text-faint shadow-[0_1px_2px_rgba(16,24,40,0.03)] transition-[border,box-shadow] duration-150 hover:border-line-hover focus:border-brand focus:outline-none focus:ring-[3px] focus:ring-brand/15 disabled:cursor-not-allowed disabled:bg-subtle disabled:text-muted aria-[invalid=true]:border-danger aria-[invalid=true]:focus:ring-danger/15";
 
 export function Field({
   label,
@@ -28,7 +28,7 @@ export function Field({
     <div className={cn("flex min-w-0 flex-col gap-1.5", className)}>
       {label && (
         <div className="flex items-center justify-between gap-2">
-          <label htmlFor={htmlFor} className="text-[12.5px] font-medium text-ink-2">
+          <label htmlFor={htmlFor} className="text-small font-medium text-ink-2">
             {label}
             {required && <span className="ml-0.5 text-danger">*</span>}
           </label>
@@ -37,11 +37,11 @@ export function Field({
       )}
       {children}
       {error ? (
-        <p className="text-[12px] text-danger" role="alert">
+        <p className="text-small text-danger" role="alert">
           {error}
         </p>
       ) : hint ? (
-        <p className="text-[12px] text-muted">{hint}</p>
+        <p className="text-small text-muted">{hint}</p>
       ) : null}
     </div>
   );
@@ -66,7 +66,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     return (
       <div className="relative">
         {leading && (
-          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-[13px] text-muted">
+          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-body text-muted">
             {leading}
           </span>
         )}
@@ -77,7 +77,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           onWheel={wheel}
           {...props}
         />
-        {trailing && <span className="absolute inset-y-0 right-3 flex items-center text-[12.5px] text-muted">{trailing}</span>}
+        {trailing && <span className="absolute inset-y-0 right-3 flex items-center text-small text-muted">{trailing}</span>}
       </div>
     );
   }

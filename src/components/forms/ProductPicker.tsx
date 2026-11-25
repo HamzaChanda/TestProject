@@ -90,16 +90,16 @@ export function ProductPicker({
           }
         }}
         placeholder={placeholder}
-        className="h-10 w-full rounded-[10px] border border-dashed border-line-strong bg-subtle pr-3 pl-9 text-[13.5px] text-ink placeholder:text-muted transition focus:border-solid focus:border-brand focus:bg-surface focus:ring-[3px] focus:ring-brand/15 focus:outline-none"
+        className="h-10 w-full rounded-panel border border-dashed border-line-strong bg-subtle pr-3 pl-9 text-ui text-ink placeholder:text-muted transition focus:border-solid focus:border-brand focus:bg-surface focus:ring-[3px] focus:ring-brand/15 focus:outline-none"
         role="combobox"
         aria-controls={listId}
         aria-expanded={open}
         aria-autocomplete="list"
       />
       {open && (
-        <div className="scrollbar-thin absolute top-[calc(100%+6px)] right-0 left-0 z-30 max-h-[340px] animate-pop-in overflow-y-auto rounded-[12px] border border-line bg-surface p-1 shadow-[var(--shadow-pop)]" role="listbox" id={listId}>
+        <div className="scrollbar-thin absolute top-[calc(100%+6px)] right-0 left-0 z-30 max-h-[340px] animate-pop-in overflow-y-auto rounded-card border border-line bg-surface p-1 shadow-[var(--shadow-pop)]" role="listbox" id={listId}>
           {results.length === 0 ? (
-            <div className="px-3 py-6 text-center text-[13px] text-muted">{query ? `No products match “${query}”` : "All products have been added"}</div>
+            <div className="px-3 py-6 text-center text-body text-muted">{query ? `No products match “${query}”` : "All products have been added"}</div>
           ) : (
             results.map((p, i) => {
               const stock = stockOf(p);
@@ -114,22 +114,22 @@ export function ProductPicker({
                   onMouseMove={() => setActive(i)}
                   onClick={() => pick(p)}
                   className={cn(
-                    "flex w-full items-center gap-3 rounded-[9px] px-2.5 py-2 text-left transition-colors",
+                    "flex w-full items-center gap-3 rounded-control px-2.5 py-2 text-left transition-colors",
                     i === active && !disabled && "bg-brand-50",
                     disabled && "cursor-not-allowed opacity-50",
                   )}
                 >
                   <ProductThumb name={p.name} category={p.category} size={30} />
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[13px] font-medium text-ink">{p.name}</span>
-                    <span className="block text-[11.5px] text-muted">
+                    <span className="block truncate text-body font-medium text-ink">{p.name}</span>
+                    <span className="block text-caption text-muted">
                       <span className="font-mono">{p.sku}</span> · {stock} available
                     </span>
                   </span>
                   <span className="hidden sm:block">
                     <StatusBadge status={stock <= 0 ? "Out of Stock" : productStatus(p)} />
                   </span>
-                  <span className="w-[84px] text-right text-[13px] font-medium text-ink tabular">{formatCurrency(priceOf(p))}</span>
+                  <span className="w-[84px] text-right text-body font-medium text-ink tabular">{formatCurrency(priceOf(p))}</span>
                   <Plus className={cn("h-4 w-4", i === active ? "text-brand" : "text-faint")} />
                 </button>
               );

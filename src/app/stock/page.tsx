@@ -78,7 +78,7 @@ function StockPageInner() {
         </Link>
       ),
     },
-    { key: "sku", header: "SKU", sortValue: (p) => p.sku, cell: (p) => <span className="font-mono text-[12px]">{p.sku}</span> },
+    { key: "sku", header: "SKU", sortValue: (p) => p.sku, cell: (p) => <span className="font-mono text-small">{p.sku}</span> },
     { key: "category", header: "Category", sortValue: (p) => p.category, cell: (p) => p.category, hideOnMobile: true, hideBelow: "wide" },
     ...state.warehouses.map(
       (w): Column<Product> => ({
@@ -98,7 +98,7 @@ function StockPageInner() {
       sortValue: (p) => qtyIn(p),
       cell: (p) => (
         <span className="font-semibold text-ink tabular">
-          {qtyIn(p)} <span className="text-[12px] font-normal text-muted">{p.unit}</span>
+          {qtyIn(p)} <span className="text-small font-normal text-muted">{p.unit}</span>
         </span>
       ),
     },

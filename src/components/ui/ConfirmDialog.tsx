@@ -62,7 +62,7 @@ export function ConfirmDialog({
           <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-info-bg text-info">
             <Info className="h-[18px] w-[18px]" />
           </div>
-          <p className="pt-1 text-[13.5px] leading-relaxed text-ink-2">{frozenBlocked.current}</p>
+          <p className="pt-1 text-ui leading-relaxed text-ink-2">{frozenBlocked.current}</p>
         </div>
       </Modal>
     );
@@ -89,7 +89,7 @@ export function ConfirmDialog({
         <div className={tone === "danger" ? "grid h-9 w-9 shrink-0 place-items-center rounded-full bg-danger-bg text-danger" : "grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-50 text-brand"}>
           <AlertTriangle className="h-[18px] w-[18px]" />
         </div>
-        <div className="min-w-0 flex-1 space-y-3 pt-1 text-[13.5px] leading-relaxed text-ink-2">
+        <div className="min-w-0 flex-1 space-y-3 pt-1 text-ui leading-relaxed text-ink-2">
           <div>{description}</div>
           {reasonLabel && (
             <Field label={reasonLabel}>

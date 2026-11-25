@@ -8,8 +8,8 @@ import { ArrowLeftRight, Boxes, MoreHorizontal, Pencil, ShoppingCart, SlidersHor
 import { useInventory } from "@/context/InventoryContext";
 import { productDeleteBlocker } from "@/lib/inventory";
 import { productStatus, stockValue, totalStock } from "@/lib/calc";
-import { getLastStockUpdate, getProductSalesStats } from "@/lib/selectors";
-import { formatCurrency, formatDate, formatDateTime } from "@/lib/utils";
+import { getLastStockUpdate, getProductSalesStats, getReplenishment, REORDER_COVER_DAYS } from "@/lib/selectors";
+import { cn, formatCurrency, formatDate, formatDateTime } from "@/lib/utils";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/Badge";
@@ -32,6 +32,8 @@ export default function ProductDetailPage() {
   const product = state.products.find((p) => p.id === id);
   const movements = useMemo(() => state.movements.filter((m) => m.productId === id), [state.movements, id]);
   const stats = useMemo(() => getProductSalesStats(state, id), [state, id]);
+  const productForAdvice = state.products.find((p) => p.id === id);
+  const advice = useMemo(() => (productForAdvice ? getReplenishment(state, productForAdvice) : null), [state, productForAdvice]);
 
   if (!product) return <NotFoundState entity="Product" backHref="/products" />;
 
@@ -46,9 +48,9 @@ export default function ProductDetailPage() {
       <PageHeader
         meta={
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-md bg-[#f2f3f6] px-1.5 py-0.5 font-mono text-[12px] text-ink-2">{product.sku}</span>
+            <span className="rounded-md bg-fill px-1.5 py-0.5 font-mono text-small text-ink-2">{product.sku}</span>
             <StatusBadge status={status} />
-            <span className="text-[12.5px] text-muted">{product.category}</span>
+            <span className="text-small text-muted">{product.category}</span>
           </div>
         }
         title={
@@ -82,7 +84,7 @@ export default function ProductDetailPage() {
       />
 
       <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
-        <StatCard label="On hand" value={`${qty} ${product.unit}`} icon={<Boxes />} accent={status === "In Stock" ? "success" : status === "Low Stock" ? "warning" : "danger"} hint={`Minimum level ${product.minStock}`} />
+        <StatCard label="On hand" value={`${qty} ${product.unit}`} icon={<Boxes />} accent={status === "In Stock" ? "success" : status === "Low Stock" ? "warning" : "danger"} hint={advice?.daysOfCover != null && qty > 0 ? `Minimum ${product.minStock} · ~${advice.daysOfCover} days of cover` : `Minimum level ${product.minStock}`} />
         <StatCard label="Stock value" value={formatCurrency(stockValue(product), { whole: true })} icon={<Wallet />} accent="info" hint={`Retail ${formatCurrency(qty * product.sellingPrice)}`} />
         <StatCard label="Units sold" value={stats.units} icon={<TrendingUp />} accent="brand" hint={`${formatCurrency(stats.revenue)} revenue`} />
         <StatCard label="Incoming" value={stats.incoming} icon={<Truck />} accent="neutral" hint={openPOs.length ? `${openPOs.length} open purchase order${openPOs.length > 1 ? "s" : ""}` : "No open orders"} />
@@ -95,6 +97,36 @@ export default function ProductDetailPage() {
         </Card>
 
         <div className="order-1 space-y-5 xl:order-2">
+          {advice && (
+            <Card className={cn(advice.suggestedQty > 0 && "border-warning-line")}>
+              <CardHeader
+                title="Replenishment"
+                description={`Based on the last 90 days of sales and ${REORDER_COVER_DAYS} days of cover`}
+              />
+              <CardBody>
+                <dl className="grid grid-cols-3 gap-3">
+                  <KeyValue label="Days of cover">
+                    {qty <= 0 ? <span className="text-danger">Sold out</span> : advice.daysOfCover === null ? <span className="text-muted">—</span> : `${advice.daysOfCover} days`}
+                  </KeyValue>
+                  <KeyValue label="Sells per week">{(advice.velocity * 7).toFixed(1)}</KeyValue>
+                  <KeyValue label="On order">{advice.incoming}</KeyValue>
+                </dl>
+                {advice.suggestedQty > 0 ? (
+                  <div className="mt-4 flex items-center justify-between gap-3 rounded-panel bg-warning-bg px-3.5 py-3">
+                    <p className="text-small text-ink-2">
+                      Order <span className="font-semibold text-ink tabular">{advice.suggestedQty}</span> {product.unit} to restore {advice.targetLevel}.
+                    </p>
+                    <ButtonLink href={`/purchases/new?product=${product.id}&qty=${advice.suggestedQty}`} size="sm" icon={<ShoppingCart className="h-3.5 w-3.5" />}>
+                      Create PO
+                    </ButtonLink>
+                  </div>
+                ) : (
+                  <p className="mt-4 rounded-panel bg-success-bg px-3.5 py-3 text-small text-success">Stock and open orders cover the target level. No order needed.</p>
+                )}
+              </CardBody>
+            </Card>
+          )}
+
           <Card>
             <CardHeader title="Stock by warehouse" />
             <CardBody className="space-y-4">
@@ -102,20 +134,20 @@ export default function ProductDetailPage() {
                 const q = product.stock[w.id] ?? 0;
                 return (
                   <div key={w.id}>
-                    <div className="mb-1.5 flex items-baseline justify-between text-[13px]">
+                    <div className="mb-1.5 flex items-baseline justify-between text-body">
                       <span className="text-ink-2">
-                        {w.name} <span className="text-[11.5px] text-faint">· {w.location}</span>
+                        {w.name} <span className="text-caption text-faint">· {w.location}</span>
                       </span>
                       <span className="font-semibold text-ink tabular">{q}</span>
                     </div>
-                    <div className="h-1.5 overflow-hidden rounded-full bg-[#eef0f3]">
+                    <div className="h-1.5 overflow-hidden rounded-full bg-pressed">
                       <div className="h-full rounded-full bg-brand" style={{ width: `${qty ? (q / qty) * 100 : 0}%` }} />
                     </div>
                   </div>
                 );
               })}
               <div className="border-t border-line pt-3">
-                <div className="mb-1.5 flex justify-between text-[12px] text-muted">
+                <div className="mb-1.5 flex justify-between text-small text-muted">
                   <span>Total vs. minimum ({product.minStock})</span>
                   <span>Last updated {formatDate(getLastStockUpdate(state, product.id))}</span>
                 </div>
@@ -161,14 +193,14 @@ export default function ProductDetailPage() {
                 {openPOs.map((po) => {
                   const line = po.items.find((i) => i.productId === id)!;
                   return (
-                    <Link key={po.id} href={`/purchases/${po.id}`} className="flex items-center justify-between rounded-[10px] border border-line px-3 py-2.5 text-[13px] transition hover:border-brand/40 hover:bg-brand-50/30">
+                    <Link key={po.id} href={`/purchases/${po.id}`} className="flex items-center justify-between rounded-panel border border-line px-3 py-2.5 text-body transition hover:border-brand/40 hover:bg-brand-50/30">
                       <span>
                         <span className="font-mono font-medium text-ink">{po.poNumber}</span>
-                        <span className="block text-[12px] text-muted">{po.supplierName}</span>
+                        <span className="block text-small text-muted">{po.supplierName}</span>
                       </span>
                       <span className="text-right">
                         <span className="font-semibold text-info tabular">+{line.quantity - line.receivedQty}</span>
-                        <span className="block text-[11.5px] text-muted">due {formatDate(po.expectedDate, "dd MMM")}</span>
+                        <span className="block text-caption text-muted">due {formatDate(po.expectedDate, "dd MMM")}</span>
                       </span>
                     </Link>
                   );

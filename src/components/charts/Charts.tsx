@@ -23,11 +23,11 @@ const PURCHASES = CHART_COLORS[1];
 
 function TooltipBox({ title, rows }: { title: string; rows: { label: string; value: string; color?: string }[] }) {
   return (
-    <div className="min-w-[180px] rounded-[10px] border border-line bg-surface px-3 py-2.5 shadow-[var(--shadow-pop)]">
-      <div className="mb-1.5 text-[12px] font-semibold text-ink">{title}</div>
+    <div className="min-w-[180px] rounded-panel border border-line bg-surface px-3 py-2.5 shadow-[var(--shadow-pop)]">
+      <div className="mb-1.5 text-small font-semibold text-ink">{title}</div>
       <div className="space-y-1">
         {rows.map((r) => (
-          <div key={r.label} className="flex items-center justify-between gap-4 text-[12px]">
+          <div key={r.label} className="flex items-center justify-between gap-4 text-small">
             <span className="flex items-center gap-1.5 text-muted">
               {r.color && <span className="h-2 w-2 rounded-[3px]" style={{ background: r.color }} />}
               {r.label}
@@ -42,7 +42,7 @@ function TooltipBox({ title, rows }: { title: string; rows: { label: string; val
 
 export function LegendItem({ color, label, value }: { color: string; label: string; value?: string }) {
   return (
-    <span className="inline-flex items-center gap-1.5 text-[12px] text-ink-2">
+    <span className="inline-flex items-center gap-1.5 text-small text-ink-2">
       <span className="h-2.5 w-2.5 rounded-[3px]" style={{ background: color }} />
       {label}
       {value && <span className="font-medium text-ink tabular">{value}</span>}
@@ -74,7 +74,7 @@ export function SalesPurchasesChart({ data, height = 280 }: { data: MonthlyPoint
             key={s.key}
             onClick={() => toggle(s.key)}
             className={cn(
-              "inline-flex items-center gap-1.5 rounded-full border border-line px-2.5 py-1 text-[12px] font-medium transition",
+              "inline-flex items-center gap-1.5 rounded-full border border-line px-2.5 py-1 text-small font-medium transition",
               hidden[s.key] ? "text-faint opacity-60" : "text-ink-2 hover:bg-subtle",
             )}
             aria-pressed={!hidden[s.key]}
@@ -168,9 +168,9 @@ export function DonutChart({
           </PieChart>
         </ResponsiveContainer>
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-          <span className="text-[11.5px] text-muted">{active ? active.name : centerLabel}</span>
-          <span className="text-[17px] font-semibold tracking-[-0.01em] text-ink tabular">{fmtCompact(active ? active.value : total)}</span>
-          {active && <span className="text-[11.5px] text-muted tabular">{total ? ((active.value / total) * 100).toFixed(1) : 0}%</span>}
+          <span className="text-caption text-muted">{active ? active.name : centerLabel}</span>
+          <span className="text-title font-semibold tracking-[-0.01em] text-ink tabular">{fmtCompact(active ? active.value : total)}</span>
+          {active && <span className="text-caption text-muted tabular">{total ? ((active.value / total) * 100).toFixed(1) : 0}%</span>}
         </div>
       </div>
       <ul className="w-full min-w-0 flex-1 space-y-1">
@@ -179,7 +179,7 @@ export function DonutChart({
             key={d.name}
             onMouseEnter={() => setActiveIdx(i)}
             onMouseLeave={() => setActiveIdx(null)}
-            className={cn("flex items-center gap-2.5 rounded-[8px] px-2 py-1.5 text-[12.5px] transition-colors", activeIdx === i && "bg-subtle")}
+            className={cn("flex items-center gap-2.5 rounded-control px-2 py-1.5 text-small transition-colors", activeIdx === i && "bg-subtle")}
           >
             <span className="h-2.5 w-2.5 shrink-0 rounded-[3px]" style={{ background: colorFor(i) }} />
             <span className="min-w-0 flex-1 truncate text-ink-2">
@@ -212,14 +212,14 @@ export function RankedBars({
     <ul className="space-y-3">
       {data.map((d) => (
         <li key={d.name} className="group">
-          <div className="mb-1 flex items-baseline justify-between gap-3 text-[12.5px]">
+          <div className="mb-1 flex items-baseline justify-between gap-3 text-small">
             <span className="truncate text-ink-2">
               {d.name}
               {d.sub && <span className="ml-1.5 text-faint">{d.sub}</span>}
             </span>
             <span className="font-medium text-ink tabular">{fmt(d.value)}</span>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-[#f0f1f4]" title={`${d.name}: ${fmt(d.value)}`}>
+          <div className="h-2 overflow-hidden rounded-full bg-fill" title={`${d.name}: ${fmt(d.value)}`}>
             <div className="h-full rounded-full transition-all group-hover:brightness-95" style={{ width: `${(d.value / max) * 100}%`, background: color }} />
           </div>
         </li>
